@@ -1,0 +1,30 @@
+ru:
+  hancock:
+    cache: 'Кэш'
+
+
+  mongoid: &mongoid
+    models:
+      hancock/cache/fragment: "Фрагмент"
+
+    attributes:
+      hancock/cache/fragment:
+        name: Метка
+        desc: Описание
+        last_clear_time: Время последнего сброса
+        last_clear_user: Автор последнего сброса
+        clear: Сбросить
+
+
+  activerecord:
+    <<: *mongoid
+
+
+  admin:
+    actions:
+      hancock_cache_clear:
+        title: Сбросить кеш"
+    hancock_cache_clear:
+      cleared: 'Кеш сброшен'
+      error: "Ошибка: %{err}"
+      no_id: "Не указан ID"
