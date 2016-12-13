@@ -36,6 +36,33 @@ module Hancock::Cache
           "views/#{_name}"
         end
 
+        def self.create_unless_exists(_name, _desc = nil, overwrite = nil)
+          if _name.is_a?(Hash)
+            _name, _desc, overwrite = _name[:name], _name[:desc], _name[:overwrite]
+          end
+
+          unless _name.blank?
+            unless frag = Hancock::Cache::Fragment.where(name: _name).first
+              frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc)
+            else
+              if overwrite
+                frag.desc = _desc
+                frag = frag.save and frag
+              end
+            end
+            frag
+          end
+        end
+        def self.load_from_preloaded
+          Hancock::Cache.config.preloaded_fragments.map do |f_data|
+            Hancock::Cache::Fragment.create_unless_exists(f_data)
+          end
+        end
+
+        def self.clear_all
+          self.all.to_a.map(&:clear!)
+        end
+
       end
 
     end

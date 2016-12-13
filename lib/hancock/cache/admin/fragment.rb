@@ -16,9 +16,11 @@ module Hancock::Cache
           end
           field :last_clear_time do
             searchable false
+            read_only true
           end
           field :last_clear_user do
             searchable false
+            read_only true
           end
         }
 
