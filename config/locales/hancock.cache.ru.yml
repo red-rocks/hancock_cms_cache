@@ -2,6 +2,8 @@ ru:
   hancock:
     cache: 'Кэш'
 
+  admin:
+    actions:
 
   mongoid: &mongoid
     models:
@@ -23,8 +25,18 @@ ru:
   admin:
     actions:
       hancock_cache_clear:
-        title: Сбросить кеш"
+        menu:       "Сбросить кеш"
+        breadcrumb: "Сбросить кеш"
+        title:      "Сбросить кеш"
+      hancock_touch:
+        menu:       "Обновить контент на сайте"
+        breadcrumb: "Обновить контент на сайте"
+        title:      "Обновить контент на сайте"
     hancock_cache_clear:
       cleared: 'Кеш сброшен'
+      error: "Ошибка: %{err}"
+      no_id: "Не указан ID"
+    hancock_touch:
+      touched: 'Обновлено'
       error: "Ошибка: %{err}"
       no_id: "Не указан ID"

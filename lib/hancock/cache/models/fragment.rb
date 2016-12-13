@@ -53,6 +53,7 @@ module Hancock::Cache
             frag
           end
         end
+
         def self.load_from_preloaded
           Hancock::Cache.config.preloaded_fragments.map do |f_data|
             Hancock::Cache::Fragment.create_unless_exists(f_data)
@@ -61,6 +62,24 @@ module Hancock::Cache
 
         def self.clear_all
           self.all.to_a.map(&:clear!)
+        end
+
+
+        def self.manager_can_add_actions
+          ret = []
+          ret << :hancock_cache_clear
+          ret << :model_settings if Hancock::Seo.config.model_settings_support
+          ret << :model_accesses if Hancock::Seo.config.user_abilities_support
+          ret += [:comments, :model_comments] if Hancock::Seo.config.ra_comments_support
+          ret.freeze
+        end
+        def self.rails_admin_add_visible_actions
+          ret = []
+          ret << :hancock_cache_clear
+          ret << :model_settings if Hancock::Seo.config.model_settings_support
+          ret << :model_accesses if Hancock::Seo.config.user_abilities_support
+          ret += [:comments, :model_comments] if Hancock::Seo.config.ra_comments_support
+          ret.freeze
         end
 
       end

@@ -8,9 +8,6 @@ module Hancock::Cache
           field :name do
             searchable true
           end
-          field :clear, :hancock_cache_clear do
-            searchable false
-          end
           field :desc do
             searchable true
           end

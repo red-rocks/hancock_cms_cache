@@ -5,6 +5,7 @@ require 'hancock/cache/configuration'
 require 'hancock/cache/admin'
 
 require 'hancock/cache/rails_admin/hancock_cache_clear'
+require 'hancock/cache/rails_admin/hancock_touch'
 
 module Hancock::Cache
   include Hancock::Plugin

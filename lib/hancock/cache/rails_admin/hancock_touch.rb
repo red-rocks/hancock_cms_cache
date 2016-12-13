@@ -1,12 +1,11 @@
 require 'rails_admin/config/actions'
-require 'rails_admin/config/model'
 
 require "rails_admin_toggleable"
 
 module RailsAdmin
   module Config
     module Actions
-      class HancockCacheClear < Base
+      class HancockTouch < Base
         RailsAdmin::Config::Actions.register(self)
 
         # Is the action acting on the root level (Example: /admin/contact)
@@ -29,7 +28,7 @@ module RailsAdmin
               # can_edit_obj = can?(:edit, @object)
               # render json: {
               #   text: fv.html_safe,
-              #   href: hancock_cache_clear_path(model_name: @abstract_model, id: @object.id),
+              #   href: hancock_touch_path(model_name: @abstract_model, id: @object.id),
               #   class: 'label ' + badge,
               #   url: index_path(model_name: @abstract_model)
               # }
@@ -37,11 +36,11 @@ module RailsAdmin
             if params['id'].present?
               begin
                 @object = @abstract_model.model.unscoped.find(params['id'])
-                if @object.clear!
+                if @object.touch
                   if params['ajax'].present?
                     ajax_link.call('♻', 'label-success')
                   else
-                    flash[:success] = I18n.t('admin.hancock_cache_clear.cleared', obj: @object)
+                    flash[:success] = I18n.t('admin.hancock_touch.touched', obj: @object)
                   end
                 else
                   if params['ajax'].present?
@@ -52,16 +51,16 @@ module RailsAdmin
                 end
               rescue Exception => e
                 if params['ajax'].present?
-                  render text: I18n.t('admin.hancock_cache_clear.error', err: e.to_s), status: 422
+                  render text: I18n.t('admin.hancock_touch.error', err: e.to_s), status: 422
                 else
-                  flash[:error] = I18n.t('admin.hancock_cache_clear.error', err: e.to_s)
+                  flash[:error] = I18n.t('admin.hancock_touch.error', err: e.to_s)
                 end
               end
             else
               if params['ajax'].present?
-                render text: I18n.t('admin.hancock_cache_clear.no_id'), status: 422
+                render text: I18n.t('admin.hancock_touch.no_id'), status: 422
               else
-                flash[:error] = I18n.t('admin.hancock_cache_clear.no_id')
+                flash[:error] = I18n.t('admin.hancock_touch.no_id')
               end
             end
 
@@ -73,7 +72,7 @@ module RailsAdmin
         end
 
         register_instance_option :link_icon do
-          'icon-trash'
+          'icon-refresh'
         end
 
         register_instance_option :pjax? do
