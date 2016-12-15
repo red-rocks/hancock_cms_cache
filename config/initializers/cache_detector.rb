@@ -10,7 +10,7 @@ module ActionView
           begin
             if Hancock::Cache.config.runtime_cache_detector
               _name = Hancock::Cache::Fragment.name_from_view(name)
-              _desc = "options: #{options}\nvirtual_path: #{@virtual_path}"
+              _desc = "#{@virtual_path}\noptions: #{options}"
               Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc)
             end
           rescue
