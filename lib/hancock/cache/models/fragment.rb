@@ -65,6 +65,33 @@ module Hancock::Cache
         end
 
 
+        def get_as_hash(overwrite = nil)
+          {
+            name: self.name,
+            desc: self.desc,
+            overwrite: overwrite
+          }.compact
+        end
+        def get_as_json(overwrite = nil)
+          get_as_hash(overwrite).to_json
+        end
+        def self.get_as_hash(overwrite = nil)
+          Hancock::Cache::Fragment.all.to_a.map { |f| f.get_as_hash(overwrite) }
+        end
+        def self.get_as_json(overwrite = nil)
+          Hancock::Cache::Fragment.all.to_a.map { |f| f.get_as_json(overwrite) }
+        end
+
+        # worse but working
+        def self.copy_preloaded_to_config_file(fname = "config/initializers/hancock_cache.rb")
+          File.truncate(fname, File.size(fname) - 4)
+          File.open(fname, 'a') do |file|
+            file.write "  config.preloaded_fragments = [\n    #{Hancock::Cache::Fragment.get_as_json.join(",\n    ")}\n  ]\nend"
+          end
+        end
+
+
+
         def self.manager_can_add_actions
           ret = []
           ret << :hancock_cache_clear
