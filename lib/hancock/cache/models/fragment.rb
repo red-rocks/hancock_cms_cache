@@ -7,6 +7,9 @@ module Hancock::Cache
       include Hancock::Cache.orm_specific('Fragment')
 
       included do
+        if Hancock::Cache.config.model_settings_support
+          include RailsAdminModelSettings::ModelSettingable
+        end
 
         # def set_last_clear_user(forced_user = nil)
         #   self.last_clear_user = forced_user if forced_user
@@ -94,18 +97,18 @@ module Hancock::Cache
 
         def self.manager_can_add_actions
           ret = []
-          ret << :hancock_cache_clear
-          ret << :model_settings if Hancock::Seo.config.model_settings_support
-          ret << :model_accesses if Hancock::Seo.config.user_abilities_support
-          ret += [:comments, :model_comments] if Hancock::Seo.config.ra_comments_support
+          ret << [:hancock_cache_clear, :hancock_cache_global_clear]
+          ret << :model_settings if Hancock::Cache.config.model_settings_support
+          ret << :model_accesses if Hancock::Cache.config.user_abilities_support
+          ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
           ret.freeze
         end
         def self.rails_admin_add_visible_actions
           ret = []
-          ret << :hancock_cache_clear
-          ret << :model_settings if Hancock::Seo.config.model_settings_support
-          ret << :model_accesses if Hancock::Seo.config.user_abilities_support
-          ret += [:comments, :model_comments] if Hancock::Seo.config.ra_comments_support
+          ret << [:hancock_cache_clear, :hancock_cache_global_clear]
+          ret << :model_settings if Hancock::Cache.config.model_settings_support
+          ret << :model_accesses if Hancock::Cache.config.user_abilities_support
+          ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
           ret.freeze
         end
 

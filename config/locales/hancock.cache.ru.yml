@@ -2,9 +2,6 @@ ru:
   hancock:
     cache: 'Кэш'
 
-  admin:
-    actions:
-
   mongoid: &mongoid
     models:
       hancock/cache/fragment: "Фрагмент"
@@ -28,6 +25,10 @@ ru:
         menu:       "Сбросить кеш"
         breadcrumb: "Сбросить кеш"
         title:      "Сбросить кеш"
+      hancock_cache_global_clear:
+        menu:       "Сброс кеша"
+        breadcrumb: "Сброс кеша"
+        title:      "Сброс кеша"
       hancock_touch:
         menu:       "Обновить контент на сайте"
         breadcrumb: "Обновить контент на сайте"

@@ -1,0 +1,24 @@
+- if request.get?
+  - _model = @abstract_model.model
+  - _model_str = _model.name.underscore
+
+  #hancock_cache_global_clear_wrapper
+    
+    #hancock_cache_global_clear.col-md-12
+      .controls
+        div= link_to "Сбросить весь кеш".freeze,        hancock_cache_global_clear_path(model_name: _model.rails_admin_name, type: 'global'),     data: {method: :post}
+        div= link_to "Сбросить кеш фрагментов".freeze,  hancock_cache_global_clear_path(model_name: _model.rails_admin_name, type: 'fragments'),  data: {method: :post}
+        div= link_to "Ошибочный тип".freeze,  hancock_cache_global_clear_path(model_name: _model.rails_admin_name.freeze, type: 'wrong'),  data: {method: :post}
+  .cf{style='clear: both'}
+
+- elsif request.post?
+  / - uniq_id = "rails_admin_model_accesses_#{(Time.new.to_f * 1000).to_i}".freeze
+  / span(class="message #{@_class}" id=uniq_id)
+  /   = @message
+  /   javascript:
+  /     setTimeout(function(){
+  /       $('##{uniq_id}').fadeOut(100, function(){
+  /         $('##{uniq_id}').remove(); 
+  /       }); 
+  /     }, 1000);
+ 
