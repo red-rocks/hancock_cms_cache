@@ -33,13 +33,26 @@ module Hancock::Cache
         end
 
         def self.set_for_object(key_name, obj)
-          _frag = self.where(name: key_name).first
-          _frag and _frag.set_for_object obj
+          if key_name.is_a?(Array)
+            return key_name.map do |k|
+              set_for_object(k, obj)
+            end
+          else
+            _frag = self.where(name: key_name).first
+            _frag and _frag.set_for_object obj
+          end
         end
-        def self.set_for_objects(_class)
-          _frag = self.where(name: key_name).first
-          _frag and _frag.set_for_objects _class
+        def self.set_for_objects(key_name, _class)
+          if key_name.is_a?(Array)
+            return key_name.map do |k|
+              set_for_objects(k, obj)
+            end
+          else
+            _frag = self.where(name: key_name).first
+            _frag and _frag.set_for_objects _class
+          end
         end
+        
         def set_for_object(obj)
           if obj.is_a?(Hash)
             if obj[:model].present?
@@ -81,8 +94,14 @@ module Hancock::Cache
         end
 
         def self.set_for_setting(key_name, setting_obj)
-          _frag = self.where(name: key_name).first
-          _frag and _frag.set_for_setting setting_obj
+          if key_name.is_a?(Array)
+            return key_name.map do |k|
+              set_for_setting(k, setting_obj)
+            end
+          else
+            _frag = self.where(name: key_name).first
+            _frag and _frag.set_for_setting setting_obj
+          end
         end
         def set_for_setting(setting_obj)
           if defined?(RailsAdminModelSettings)
