@@ -52,7 +52,7 @@ module Hancock::Cache
             _frag and _frag.set_for_objects _class
           end
         end
-        
+
         def set_for_object(obj)
           if obj.is_a?(Hash)
             if obj[:model].present?
@@ -127,7 +127,9 @@ module Hancock::Cache
 
 
             if setting_obj
+              puts setting_obj.inspect
               setting_obj.cache_keys << self.name
+              puts setting_obj.inspect
               setting_obj.save
             end
           end

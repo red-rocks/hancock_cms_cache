@@ -64,7 +64,7 @@ if Hancock.mongoid?
       end
 
       def all_cache_keys
-        return @all_cache_keys if @all_cache_keys
+        # return @all_cache_keys if @all_cache_keys
         @all_cache_keys = cache_keys || []
         @all_cache_keys += selected_conditional_cache_keys.map { |k| k[:name] }
         @all_cache_keys
@@ -72,15 +72,15 @@ if Hancock.mongoid?
 
 
       def cache_keys
-        return @cache_keys if @cache_keys
+        # return @cache_keys if @cache_keys
 
         def <<(_keys)
-          cache_keys_str = (cache_keys + _keys).select { |k|
+          cache_keys_str = (cache_keys + _keys).flatten.select { |k|
             k and !k.strip.blank?
           }.map(&:strip).uniq.join("\n")
           cache_keys
         end
-        
+
         cache_keys_str ||= ""
         @cache_keys = cache_keys_str.split(/\s+/).map { |k| k.strip }.reject { |k| k.blank? }
       end
