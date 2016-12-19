@@ -104,7 +104,7 @@ if Hancock.mongoid?
         if perform_caching
           # cache_keys and cache_keys.is_a?(Array) and cache_keys.each do |k|
           all_cache_keys and all_cache_keys.is_a?(Array) and all_cache_keys.each do |k|
-            Rails.cache.delete(k)
+            Rails.cache.delete(k) unless k.blank?
           end
           # @cache_keys = nil
           @all_cache_keys = nil

@@ -27,6 +27,54 @@ module Hancock::Cache
           end
         end
 
+        def self.set_for_object(key_name, obj)
+          _frag = self.where(name: key_name).first
+          _frag and _frag.set_for_object obj
+        end
+        def self.set_for_objects(_class)
+          _frag = self.where(name: key_name).first
+          _frag and _frag.set_for_objects _class
+        end
+        def set_for_object(obj)
+          if obj.is_a?(Hash)
+            if obj[:model].present?
+              if obj[:ids].present?
+                return obj[:ids].map do |_id|
+                  set_for_setting({model: obj[:model], id: obj[:id]})
+                end
+              else
+                if obj[:id].nil?
+                  return set_for_objects(obj[:model])
+                else
+                  obj = obj[:model].where(id: obj[:id]).first
+                end
+              end
+            else
+              return false
+            end
+
+          elsif setting_obj.is_a?(Array)
+            return obj.map do |_obj|
+              set_for_object(_obj)
+            end
+          end
+
+          if obj
+            if obj.is_a?(Class)
+              set_for_objects obj
+            else
+              obj.cache_keys << self.name
+              obj.save
+            end
+          end
+        end
+        def self.set_for_objects(_class)
+          _class.all.map { |obj|
+            obj.cache_keys << self.name
+            obj.save
+          }
+        end
+
         def self.set_for_setting(key_name, setting_obj)
           _frag = self.where(name: key_name).first
           _frag and _frag.set_for_setting setting_obj
@@ -35,20 +83,22 @@ module Hancock::Cache
           if defined?(RailsAdminModelSettings)
             if setting_obj.is_a?(Hash)
               unless setting_obj[:keys].present?
-                setting_obj = RailsAdminSettings::Setting.where(ns: setting_obj[:ns], key: setting_obj[:key]).first
+                if setting_obj[:key].nil?
+                  return set_for_setting({ns: setting_obj[:ns], key: //})
+                else
+                  setting_obj = RailsAdminSettings::Setting.where(ns: setting_obj[:ns], key: setting_obj[:key]).first
+                end
 
               else
-                setting_obj[:keys].each do |k|
+                return setting_obj[:keys].map do |k|
                   set_for_setting({ns: setting_obj[:ns], key: k})
                 end
-                return true
               end
 
             elsif setting_obj.is_a?(Array)
-              setting_obj.each do |obj|
+              return setting_obj.map do |obj|
                 set_for_setting(obj)
               end
-              return true
             end
 
 
