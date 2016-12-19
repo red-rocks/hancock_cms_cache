@@ -67,8 +67,8 @@ module Hancock::Cache
           end
         end
 
-        def self.clear_all
-          self.all.to_a.map(&:clear!)
+        def self.clear_all(forced_user = nil)
+          self.all.to_a.map { |c| c.clear!(forced_user) }
         end
 
 

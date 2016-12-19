@@ -27,6 +27,12 @@ if Hancock.mongoid?
       def set_default_cache_keys!(strategy = :append)
         self.set_default_cache_keys(strategy) and self.save
       end
+      def self.set_default_cache_keys(strategy = :append)
+        self.all.to_a.map { |obj| obj.set_default_cache_keys(strategy) }
+      end
+      def self.set_default_cache_keys!(strategy = :append)
+        self.all.to_a.map { |obj| obj.set_default_cache_keys!(strategy) }
+      end
 
       def conditional_cache_keys
         [{}]
@@ -74,29 +80,17 @@ if Hancock.mongoid?
       def cache_keys
         # return @cache_keys if @cache_keys
 
-        def <<(_keys)
-          cache_keys_str = (cache_keys + _keys).flatten.select { |k|
-            k and !k.strip.blank?
-          }.map(&:strip).uniq.join("\n")
-          cache_keys
-        end
-
-        cache_keys_str ||= ""
-        @cache_keys = cache_keys_str.split(/\s+/).map { |k| k.strip }.reject { |k| k.blank? }
+        self.cache_keys_str ||= ""
+        # @cache_keys = cache_keys_str.split(/\s+/).map { |k| k.strip }.reject { |k| k.blank? }
+        self.cache_keys_str.split(/\s+/).map { |k| k.strip }.reject { |k| k.blank? }
       end
       def cache_keys=(_keys)
         _keys ||= []
-        cache_keys_str = _keys.select { |k|
+        self.cache_keys_str = _keys.select { |k|
           k and !k.strip.blank?
         }.map(&:strip).uniq.join("\n")
         cache_keys
       end
-      # def cache_keys<<(_keys)
-      #   cache_keys_str = (cache_keys + _keys).select { |k|
-      #     k and !k.strip.blank?
-      #   }.map(&:strip).uniq.join("\n")
-      #   cache_keys
-      # end
       field :perform_caching, type: Boolean, default: true
 
       after_touch :clear_cache

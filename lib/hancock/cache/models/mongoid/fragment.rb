@@ -81,15 +81,19 @@ module Hancock::Cache
             if obj.is_a?(Class)
               set_for_objects obj
             else
-              obj.cache_keys << self.name
-              obj.save
+              unless obj.cache_keys.include?(self.name)
+                obj.set(cache_keys_str: (obj.cache_keys << self.name).uniq.join("\n"))
+                obj.reload
+              end
             end
           end
         end
         def set_for_objects(_class)
           _class.all.map { |obj|
-            obj.cache_keys << self.name
-            obj.save
+            unless obj.cache_keys.include?(self.name)
+              obj.set(cache_keys_str: (obj.cache_keys << self.name).uniq.join("\n"))
+              obj.reload
+            end
           }
         end
 
@@ -127,10 +131,10 @@ module Hancock::Cache
 
 
             if setting_obj
-              puts setting_obj.inspect
-              setting_obj.cache_keys << self.name
-              puts setting_obj.inspect
-              setting_obj.save
+              unless setting_obj.cache_keys.include?(self.name)
+                setting_obj.set(cache_keys_str: (setting_obj.cache_keys << self.name).uniq.join("\n"))
+                setting_obj.reload
+              end
             end
           end
         end
