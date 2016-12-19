@@ -53,7 +53,7 @@ module Hancock::Cache
               return false
             end
 
-          elsif setting_obj.is_a?(Array)
+          elsif obj.is_a?(Array)
             return obj.map do |_obj|
               set_for_object(_obj)
             end
