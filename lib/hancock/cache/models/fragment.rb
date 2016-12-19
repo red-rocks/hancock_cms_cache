@@ -7,6 +7,10 @@ module Hancock::Cache
       include Hancock::Cache.orm_specific('Fragment')
 
       included do
+        def self.rails_admin_name
+          self.name.gsub("::", "~").underscore
+        end
+
         if Hancock::Cache.config.model_settings_support
           include RailsAdminModelSettings::ModelSettingable
         end
@@ -96,16 +100,14 @@ module Hancock::Cache
 
 
         def self.manager_can_add_actions
-          ret = []
-          ret << [:hancock_cache_clear, :hancock_cache_global_clear]
+          ret = [:hancock_cache_clear, :hancock_cache_global_clear]
           ret << :model_settings if Hancock::Cache.config.model_settings_support
           ret << :model_accesses if Hancock::Cache.config.user_abilities_support
           ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
           ret.freeze
         end
         def self.rails_admin_add_visible_actions
-          ret = []
-          ret << [:hancock_cache_clear, :hancock_cache_global_clear]
+          ret = [:hancock_cache_clear, :hancock_cache_global_clear]
           ret << :model_settings if Hancock::Cache.config.model_settings_support
           ret << :model_accesses if Hancock::Cache.config.user_abilities_support
           ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
