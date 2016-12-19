@@ -68,7 +68,7 @@ module Hancock::Cache
             end
           end
         end
-        def self.set_for_objects(_class)
+        def set_for_objects(_class)
           _class.all.map { |obj|
             obj.cache_keys << self.name
             obj.save
