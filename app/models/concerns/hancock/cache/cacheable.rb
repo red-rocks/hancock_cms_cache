@@ -84,6 +84,7 @@ if Hancock.mongoid?
         @cache_keys = cache_keys_str.split(/\s+/).map { |k| k.strip }.reject { |k| k.blank? }
       end
       def cache_keys=(_keys)
+        _keys ||= []
         cache_keys_str = _keys.select { |k|
           k and !k.strip.blank?
         }.map(&:strip).uniq.join("\n")
