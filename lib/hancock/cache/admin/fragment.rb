@@ -5,19 +5,47 @@ module Hancock::Cache
         Proc.new {
           navigation_label I18n.t('hancock.cache')
 
-          field :name do
-            searchable true
+          list do
+            field :name do
+              searchable true
+            end
+            field :desc do
+              searchable true
+            end
+            field :last_clear_time do
+              searchable false
+            end
+            field :last_clear_user do
+              searchable false
+            end
+            field :data do
+              searchable true
+              pretty_value do
+                bindings[:object].data(false)
+              end
+            end
           end
-          field :desc do
-            searchable true
+
+          edit do
+            field :name
+            field :desc
+            field :last_clear_time do
+              read_only true
+            end
+            field :last_clear_user do
+              read_only true
+            end
+            field :data do
+              read_only true
+            end
           end
-          field :last_clear_time do
-            searchable false
-            read_only true
-          end
-          field :last_clear_user do
-            searchable false
-            read_only true
+
+          show do
+            field :name
+            field :desc
+            field :last_clear_time
+            field :last_clear_user
+            field :data 
           end
         }
 

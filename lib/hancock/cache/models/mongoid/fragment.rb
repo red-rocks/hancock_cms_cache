@@ -18,6 +18,11 @@ module Hancock::Cache
           belongs_to :last_clear_user, class_name: Mongoid::Userstamp.config.user_model_name, autosave: false, optional: true, required: false
         end
 
+        def data(prettify = true)
+          _data = Rails.cache.read(self.name)
+          prettify ? "<pre>#{CGI::escapeHTML(Nokogiri::HTML.fragment(_data).to_xhtml(indent: 2))}</pre>".html_safe : _data
+        end
+
         def set_last_clear_user(forced_user = nil)
           unless forced_user
             return false unless Mongoid::Userstamp.has_current_user?
