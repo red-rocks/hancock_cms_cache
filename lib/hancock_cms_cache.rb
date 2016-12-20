@@ -6,6 +6,7 @@ require 'hancock/cache/admin'
 
 require 'hancock/cache/rails_admin_ext/hancock_cache_clear'
 require 'hancock/cache/rails_admin_ext/hancock_cache_global_clear'
+require 'hancock/cache/rails_admin_ext/hancock_cache_get_snapshot'
 require 'hancock/cache/rails_admin_ext/hancock_touch'
 
 require 'hancock/cache/rails_admin_settings_patch'

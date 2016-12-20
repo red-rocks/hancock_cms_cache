@@ -1,7 +1,5 @@
 require 'rails_admin/config/actions'
 
-require "rails_admin_toggleable"
-
 module RailsAdmin
   module Config
     module Actions

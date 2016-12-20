@@ -1,7 +1,4 @@
 require 'rails_admin/config/actions'
-require 'rails_admin/config/model'
-
-require "rails_admin_toggleable"
 
 module RailsAdmin
   module Config
@@ -44,7 +41,7 @@ module RailsAdmin
                 end
               when "fragments"
                 begin
-                  Hancock::Cache::Fragment.all.to_a.map do |f|
+                  Hancock::Cache::Fragment.cutted.all.to_a.map do |f|
                     f.clear!
                   end
                   flash[:success] = 'Кеш очищен'

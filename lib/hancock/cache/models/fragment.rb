@@ -49,7 +49,7 @@ module Hancock::Cache
           end
 
           unless _name.blank?
-            unless frag = Hancock::Cache::Fragment.where(name: _name).first
+            unless frag = Hancock::Cache::Fragment.cutted.where(name: _name).first
               frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc)
             else
               if overwrite
@@ -83,10 +83,10 @@ module Hancock::Cache
           get_as_hash(overwrite).to_json
         end
         def self.get_as_hash(overwrite = nil)
-          Hancock::Cache::Fragment.all.to_a.map { |f| f.get_as_hash(overwrite) }
+          Hancock::Cache::Fragment.cutted.all.to_a.map { |f| f.get_as_hash(overwrite) }
         end
         def self.get_as_json(overwrite = nil)
-          Hancock::Cache::Fragment.all.to_a.map { |f| f.get_as_json(overwrite) }
+          Hancock::Cache::Fragment.cutted.all.to_a.map { |f| f.get_as_json(overwrite) }
         end
 
         # worse but working
@@ -100,14 +100,14 @@ module Hancock::Cache
 
 
         def self.manager_can_add_actions
-          ret = [:hancock_cache_clear, :hancock_cache_global_clear]
+          ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_get_snapshot]
           ret << :model_settings if Hancock::Cache.config.model_settings_support
           ret << :model_accesses if Hancock::Cache.config.user_abilities_support
           ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
           ret.freeze
         end
         def self.rails_admin_add_visible_actions
-          ret = [:hancock_cache_clear, :hancock_cache_global_clear]
+          ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_get_snapshot]
           ret << :model_settings if Hancock::Cache.config.model_settings_support
           ret << :model_accesses if Hancock::Cache.config.user_abilities_support
           ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support

@@ -29,6 +29,10 @@ ru:
         menu:       "Сброс кеша"
         breadcrumb: "Сброс кеша"
         title:      "Сброс кеша"
+      hancock_cache_get_snapshot:
+        menu:       "Сохранить снапшот"
+        breadcrumb: "Сохранить снапшот"
+        title:      "Сохранить снапшот"
       hancock_touch:
         menu:       "Обновить контент на сайте"
         breadcrumb: "Обновить контент на сайте"
@@ -39,5 +43,9 @@ ru:
       no_id: "Не указан ID"
     hancock_touch:
       touched: 'Обновлено'
+      error: "Ошибка: %{err}"
+      no_id: "Не указан ID"
+    hancock_cache_get_snapshot:
+      gotten: 'Снапшот сохранен'
       error: "Ошибка: %{err}"
       no_id: "Не указан ID"

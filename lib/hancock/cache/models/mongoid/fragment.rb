@@ -4,6 +4,11 @@ module Hancock::Cache
       extend ActiveSupport::Concern
 
       included do
+
+        scope :cutted, -> {
+          without(:snapshot, :last_snapshot_time)
+        }
+
         index({name: 1}, {unique: true, background: true})
         index({last_clear_user_id: 1, last_clear_time: 1}, {background: true})
 
@@ -18,9 +23,24 @@ module Hancock::Cache
           belongs_to :last_clear_user, class_name: Mongoid::Userstamp.config.user_model_name, autosave: false, optional: true, required: false
         end
 
+        field :last_snapshot_time, type: DateTime
+        field :snapshot, type: String, localize: false
+        def get_snapshot(prettify = true)
+          _data = self.snapshot || ""
+          (prettify ? "<pre>#{CGI::escapeHTML(Nokogiri::HTML.fragment(_data).to_xhtml(indent: 2))}</pre>".html_safe : _data)
+        end
+        def write_snapshot
+          self.snapshot = self.data(false)
+        end
+        def write_snapshot!
+          self.write_snapshot
+          self.last_snapshot_time = Time.new
+          self.save
+        end
+
         def data(prettify = true)
           _data = Rails.cache.read(self.name)
-          prettify ? "<pre>#{CGI::escapeHTML(Nokogiri::HTML.fragment(_data).to_xhtml(indent: 2))}</pre>".html_safe : _data
+          (prettify ? "<pre>#{CGI::escapeHTML(Nokogiri::HTML.fragment(_data).to_xhtml(indent: 2))}</pre>".html_safe : _data)
         end
 
         def set_last_clear_user(forced_user = nil)

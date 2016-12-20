@@ -6,6 +6,7 @@ module Hancock::Cache
           navigation_label I18n.t('hancock.cache')
 
           list do
+
             field :name do
               searchable true
             end
@@ -19,11 +20,19 @@ module Hancock::Cache
               searchable false
             end
             field :data do
-              searchable true
               pretty_value do
                 bindings[:object].data(false)
               end
             end
+
+            field :snapshot do
+              searchable true
+              pretty_value do
+                bindings[:object].get_snapshot(false)
+              end
+              queryable true
+            end
+            field :last_snapshot_time
           end
 
           edit do
@@ -38,6 +47,14 @@ module Hancock::Cache
             field :data do
               read_only true
             end
+
+            field :snapshot do
+              pretty_value do
+                bindings[:object].get_snapshot
+              end
+              read_only true
+            end
+            field :last_snapshot_time
           end
 
           show do
@@ -45,7 +62,14 @@ module Hancock::Cache
             field :desc
             field :last_clear_time
             field :last_clear_user
-            field :data 
+            field :data
+
+            field :snapshot do
+              pretty_value do
+                bindings[:object].get_snapshot
+              end
+            end
+            field :last_snapshot_time
           end
         }
 
