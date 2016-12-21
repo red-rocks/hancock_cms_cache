@@ -48,6 +48,12 @@ module Hancock::Cache
             _name, _desc, overwrite = _name[:name], _name[:desc], _name[:overwrite]
           end
 
+          if _name.is_a?(Array)
+            return _name.map do |n|
+              create_unless_exists(n, _desc, overwrite) unless n.blank?
+            end
+          end
+
           unless _name.blank?
             unless frag = Hancock::Cache::Fragment.cutted.where(name: _name).first
               frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc)
@@ -100,14 +106,14 @@ module Hancock::Cache
 
 
         def self.manager_can_add_actions
-          ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_get_snapshot]
+          ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_dump_snapshot, :hancock_cache_restore_snapshot]
           ret << :model_settings if Hancock::Cache.config.model_settings_support
           ret << :model_accesses if Hancock::Cache.config.user_abilities_support
           ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
           ret.freeze
         end
         def self.rails_admin_add_visible_actions
-          ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_get_snapshot]
+          ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_dump_snapshot, :hancock_cache_restore_snapshot]
           ret << :model_settings if Hancock::Cache.config.model_settings_support
           ret << :model_accesses if Hancock::Cache.config.user_abilities_support
           ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support

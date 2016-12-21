@@ -5,9 +5,7 @@ module Hancock::Cache
 
       included do
 
-        scope :cutted, -> {
-          without(:snapshot, :last_snapshot_time)
-        }
+        include Hancock::Cache::Snapshotable
 
         index({name: 1}, {unique: true, background: true})
         index({last_clear_user_id: 1, last_clear_time: 1}, {background: true})
@@ -23,20 +21,6 @@ module Hancock::Cache
           belongs_to :last_clear_user, class_name: Mongoid::Userstamp.config.user_model_name, autosave: false, optional: true, required: false
         end
 
-        field :last_snapshot_time, type: DateTime
-        field :snapshot, type: String, localize: false
-        def get_snapshot(prettify = true)
-          _data = self.snapshot || ""
-          (prettify ? "<pre>#{CGI::escapeHTML(Nokogiri::HTML.fragment(_data).to_xhtml(indent: 2))}</pre>".html_safe : _data)
-        end
-        def write_snapshot
-          self.snapshot = self.data(false)
-        end
-        def write_snapshot!
-          self.write_snapshot
-          self.last_snapshot_time = Time.new
-          self.save
-        end
 
         def data(prettify = true)
           _data = Rails.cache.read(self.name)
@@ -55,7 +39,7 @@ module Hancock::Cache
         def self.set_for_object(key_name, obj)
           if key_name.is_a?(Array)
             return key_name.map do |k|
-              set_for_object(k, obj)
+              set_for_object(k, obj) unless k.blank?
             end
           else
             _frag = self.where(name: key_name).first
@@ -65,7 +49,7 @@ module Hancock::Cache
         def self.set_for_objects(key_name, _class)
           if key_name.is_a?(Array)
             return key_name.map do |k|
-              set_for_objects(k, obj)
+              set_for_objects(k, obj) unless k.blank?
             end
           else
             _frag = self.where(name: key_name).first
@@ -78,7 +62,7 @@ module Hancock::Cache
             if obj[:model].present?
               if obj[:ids].present?
                 return obj[:ids].map do |_id|
-                  set_for_setting({model: obj[:model], id: obj[:id]})
+                  set_for_setting({model: obj[:model], id: _id}) unless _id.blank?
                 end
               else
                 if obj[:id].nil?
@@ -93,7 +77,7 @@ module Hancock::Cache
 
           elsif obj.is_a?(Array)
             return obj.map do |_obj|
-              set_for_object(_obj)
+              set_for_object(_obj) unless _obj.blank?
             end
           end
 
@@ -120,7 +104,7 @@ module Hancock::Cache
         def self.set_for_setting(key_name, setting_obj)
           if key_name.is_a?(Array)
             return key_name.map do |k|
-              set_for_setting(k, setting_obj)
+              set_for_setting(k, setting_obj) unless k.blank?
             end
           else
             _frag = self.where(name: key_name).first
@@ -139,23 +123,17 @@ module Hancock::Cache
 
               else
                 return setting_obj[:keys].map do |k|
-                  set_for_setting({ns: setting_obj[:ns], key: k})
+                  set_for_setting({ns: setting_obj[:ns], key: k}) unless k.blank?
                 end
               end
 
             elsif setting_obj.is_a?(Array)
               return setting_obj.map do |obj|
-                set_for_setting(obj)
+                set_for_setting(obj) unless obj.blank?
               end
             end
 
-
-            if setting_obj
-              unless setting_obj.cache_keys.include?(self.name)
-                setting_obj.set(cache_keys_str: (setting_obj.cache_keys << self.name).uniq.join("\n"))
-                setting_obj.reload
-              end
-            end
+            setting_obj and set_for_object(setting_obj) and setting_obj.reload
           end
         end
 
