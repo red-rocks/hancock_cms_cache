@@ -6,7 +6,7 @@ if Hancock.mongoid?
     included do
 
       scope :cutted, -> {
-        without(:snapshot, :last_snapshot_time)
+        without(:snapshot)#, :last_dump_snapshot_time, :last_restore_snapshot_time)
       }
 
       field :last_dump_snapshot_time, type: DateTime

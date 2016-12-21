@@ -32,7 +32,8 @@ module Hancock::Cache
               end
               queryable true
             end
-            field :last_snapshot_time
+            field :last_dump_snapshot_time
+            field :last_restore_snapshot_time
           end
 
           edit do
@@ -54,7 +55,8 @@ module Hancock::Cache
               end
               read_only true
             end
-            field :last_snapshot_time
+            field :last_dump_snapshot_time
+            field :last_restore_snapshot_time
           end
 
           show do
@@ -69,7 +71,8 @@ module Hancock::Cache
                 bindings[:object].get_snapshot
               end
             end
-            field :last_snapshot_time
+            field :last_dump_snapshot_time
+            field :last_restore_snapshot_time
           end
         }
 
