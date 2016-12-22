@@ -7,8 +7,9 @@
     #hancock_cache_global_clear.col-md-12
       .controls
         div= link_to "Сбросить весь кеш".freeze,        hancock_cache_global_clear_path(model_name: _model.rails_admin_name, type: 'global'),     data: {method: :post}
+        div
         div= link_to "Сбросить кеш фрагментов".freeze,  hancock_cache_global_clear_path(model_name: _model.rails_admin_name, type: 'fragments'),  data: {method: :post}
-        div= link_to "Ошибочный тип".freeze,  hancock_cache_global_clear_path(model_name: _model.rails_admin_name.freeze, type: 'wrong'),  data: {method: :post}
+        div
   .cf{style='clear: both'}
 
 - elsif request.post?
