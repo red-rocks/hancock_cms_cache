@@ -126,6 +126,7 @@ module Hancock::Cache
           {
             name: self.name,
             desc: self.desc,
+            virtual_path: self.virtual_path,
             overwrite: overwrite
           }.compact
         end
@@ -143,7 +144,7 @@ module Hancock::Cache
         def self.copy_preloaded_to_config_file(fname = "config/initializers/hancock_cache.rb")
           File.truncate(fname, File.size(fname) - 4)
           File.open(fname, 'a') do |file|
-            file.write "  config.preloaded_fragments = [\n    #{Hancock::Cache::Fragment.get_as_json.join(",\n    ")}\n  ]\nend"
+            file.write "  config.preloaded_fragments = [\n    #{Hancock::Cache::Fragment.get_as_json.join(",\n    ")}\n  ]\n  # Hancock::Cache::Fragment.load_from_preloaded\n  # Hancock::MODELS.map { |m| m.respond_to?(:set_default_cache_keys!) and m.set_default_cache_keys! }\nend"
           end
         end
 
