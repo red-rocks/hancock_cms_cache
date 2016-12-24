@@ -84,9 +84,10 @@ module Hancock::Cache
           end
 
           unless _name.blank?
-            unless frag = Hancock::Cache::Fragment.cutted.where(name: _name).first
+            if Hancock::Cache::Fragment.where(name: _name).count == 0
               frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc, virtual_path: _virtual_path)
             else
+              frag = Hancock::Cache::Fragment.where(name: _name).first
               if overwrite.is_a?(Symbol) or overwrite.is_a?(String)
                 case overwrite.to_sym
                 when :append
