@@ -68,12 +68,19 @@ if Hancock.mongoid?
           cond_if and cond_unless
         } or []
       end
+      def selected_conditional_cache_keys_names
+        selected_conditional_cache_keys.map { |k| k[:name] }
+      end
 
-      def all_cache_keys
+      def all_cache_keys(cached = true)
         # return @all_cache_keys if @all_cache_keys
-        @all_cache_keys = cache_keys || []
-        @all_cache_keys += selected_conditional_cache_keys.map { |k| k[:name] }
-        @all_cache_keys
+        if cached
+          @all_cache_keys = cache_keys || []
+          @all_cache_keys += selected_conditional_cache_keys_names
+          @all_cache_keys
+        else
+          (cache_keys || []) + selected_conditional_cache_keys_names
+        end
       end
 
 
@@ -93,17 +100,35 @@ if Hancock.mongoid?
       end
       field :perform_caching, type: Boolean, default: true
 
+      def cache_fragments
+        Hancock::Cache::Fragment.where(:name.in => cache_keys)
+      end
+      def all_cache_fragments
+        Hancock::Cache::Fragment.where(:name.in => all_cache_keys(false))
+      end
+
+      attr_accessor :cache_cleared
+
       after_touch :clear_cache
       after_save :clear_cache
       after_destroy :clear_cache
       def clear_cache
-        if perform_caching
+        if perform_caching and !cache_cleared
           # cache_keys and cache_keys.is_a?(Array) and cache_keys.each do |k|
           all_cache_keys and all_cache_keys.is_a?(Array) and all_cache_keys.each do |k|
-            Rails.cache.delete(k) unless k.blank?
+            unless k.blank?
+              k = k.strip
+              if _frag = Hancock::Cache::Fragment.where(name: k).first
+                _frag.clear!
+              else
+                Rails.cache.delete(k)
+              end
+            end
           end
           # @cache_keys = nil
           @all_cache_keys = nil
+
+          cache_cleared = true
         end
       end
 

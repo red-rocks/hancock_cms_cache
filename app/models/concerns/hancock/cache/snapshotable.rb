@@ -15,7 +15,15 @@ if Hancock.mongoid?
 
       def get_snapshot(prettify = true)
         _data = self.snapshot || ""
-        (prettify ? "<pre>#{CGI::escapeHTML(Nokogiri::HTML.fragment(_data).to_xhtml(indent: 2))}</pre>".html_safe : _data)
+        if prettify
+          if self.is_html
+            "<pre>#{CGI::escapeHTML(Nokogiri::HTML.fragment(_data).to_xhtml(indent: 2))}</pre>".html_safe
+          else
+            _data
+          end
+        else
+          _data
+        end
       end
       def dump_snapshot
         self.snapshot = self.data(false)

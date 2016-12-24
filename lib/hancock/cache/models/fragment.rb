@@ -7,6 +7,18 @@ module Hancock::Cache
       include Hancock::Cache.orm_specific('Fragment')
 
       included do
+        cattr_accessor :cleared_stack
+        LOCK = Mutex.new
+        def self.drop_cleared_stack
+          LOCK.synchronize do
+            self.cleared_stack = []
+          end
+        end
+        def drop_cleared_stack
+          self.class.drop_cleared_stack
+        end
+        drop_cleared_stack
+
         def self.rails_admin_name
           self.name.gsub("::", "~").underscore
         end
@@ -23,15 +35,32 @@ module Hancock::Cache
         end
 
         def clear(forced_user = nil)
+          return nil if self.class.cleared_stack.include?(self.name)
           if self.set_last_clear_user(forced_user)
-            Rails.cache.delete(self.name)
-            self.last_clear_time = Time.new
+            LOCK.synchronize do
+              Rails.cache.delete(self.name)
+              self.last_clear_time = Time.new
+              self.class.cleared_stack << self.name
+            end
+            self.parents.each { |p| p.clear(forced_user) }
+            LOCK.synchronize do
+              self.class.drop_cleared_stack if self.class.cleared_stack.first == self.name
+            end
+            self
           end
         end
         def clear!(forced_user = nil)
+          return nil if self.class.cleared_stack.include?(self.name)
           if self.set_last_clear_user(forced_user)
-            Rails.cache.delete(self.name)
-            self.last_clear_time = Time.new
+            LOCK.synchronize do
+              Rails.cache.delete(self.name)
+              self.last_clear_time = Time.new
+              self.class.cleared_stack << self.name
+            end
+            self.parents.each { |p| p.clear!(forced_user) }
+            LOCK.synchronize do
+              self.class.drop_cleared_stack if self.class.cleared_stack.first == self.name
+            end
             self.save
           end
         end
@@ -43,24 +72,39 @@ module Hancock::Cache
           "views/#{_name}"
         end
 
-        def self.create_unless_exists(_name, _desc = nil, overwrite = nil)
+        def self.create_unless_exists(_name, _desc = nil, _virtual_path = nil, overwrite = :append)
           if _name.is_a?(Hash)
-            _name, _desc, overwrite = _name[:name], _name[:desc], _name[:overwrite]
+            _name, _desc, _virtual_path, overwrite = _name[:name], _name[:desc], _name[:_virtual_path], _name[:overwrite]
           end
 
           if _name.is_a?(Array)
             return _name.map do |n|
-              create_unless_exists(n, _desc, overwrite) unless n.blank?
+              create_unless_exists(n, _desc, _virtual_path, overwrite) unless n.blank?
             end
           end
 
           unless _name.blank?
             unless frag = Hancock::Cache::Fragment.cutted.where(name: _name).first
-              frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc)
+              frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc, virtual_path: _virtual_path)
             else
-              if overwrite
-                frag.desc = _desc
-                frag = frag.save and frag
+              if overwrite.is_a?(Symbol) or overwrite.is_a?(String)
+                case overwrite.to_sym
+                when :append
+                  frag.desc = "\n#{_desc}" unless frag.desc == _desc
+                  frag.virtual_path += "\n#{_virtual_path}" unless frag.virtual_path == _virtual_path
+                  frag = frag.save and frag
+                when :overwrite
+                  frag.desc = _desc
+                  frag.virtual_path = _desc
+                  frag = frag.save and frag
+                else
+                end
+              else
+                if overwrite
+                  frag.desc = _desc
+                  frag.virtual_path = _desc
+                  frag = frag.save and frag
+                end
               end
             end
             frag

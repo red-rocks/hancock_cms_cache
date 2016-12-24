@@ -13,6 +13,8 @@ module Hancock::Cache
         field :name, type: String, localize: false, default: ""
 
         field :desc, type: String, localize: Hancock::Cache.config.localize, default: ""
+        field :virtual_path, type: String, localize: false, default: ""
+        field :is_html, type: Boolean, default: true
 
         field :last_clear_time, type: DateTime
         if Hancock.rails4?
@@ -21,10 +23,37 @@ module Hancock::Cache
           belongs_to :last_clear_user, class_name: Mongoid::Userstamp.config.user_model_name, autosave: false, optional: true, required: false
         end
 
+        has_and_belongs_to_many :parents, class_name: "Hancock::Cache::Fragment", inverse_of: nil
+
+
+        def name_n_desc
+          "#{self.name}<hr>#{self.desc}".html_safe
+        end
+        def parents_str
+          self.parents.map(&:name).join(", ")
+        end
+        def name_n_desc_n_parents
+          "#{self.name}<hr>#{self.desc}<hr>#{parents_str}".html_safe
+        end
+
+        def last_clear_data
+          "#{self.last_clear_time}<hr>#{self.last_clear_user}".html_safe
+        end
+        def snapshot_data
+          "#{self.last_dump_snapshot_time}<hr>#{self.last_restore_snapshot_time}<hr>#{self.get_snapshot(false)}".html_safe
+        end
 
         def data(prettify = true)
           _data = Rails.cache.read(self.name)
-          (prettify ? "<pre>#{CGI::escapeHTML(Nokogiri::HTML.fragment(_data).to_xhtml(indent: 2))}</pre>".html_safe : _data)
+          if prettify
+            if self.is_html
+              "<pre>#{CGI::escapeHTML(Nokogiri::HTML.fragment(_data).to_xhtml(indent: 2))}</pre>".html_safe
+            else
+              _data
+            end
+          else
+            _data
+          end
         end
 
         def set_last_clear_user(forced_user = nil)
@@ -49,7 +78,7 @@ module Hancock::Cache
         def self.set_for_objects(key_name, _class)
           if key_name.is_a?(Array)
             return key_name.map do |k|
-              set_for_objects(k, obj) unless k.blank?
+              set_for_objects(k, _class) unless k.blank?
             end
           else
             _frag = self.where(name: key_name).first

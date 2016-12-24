@@ -42,7 +42,7 @@ ru:
         breadcrumb: "Обновить контент на сайте"
         title:      "Обновить контент на сайте"
     hancock_cache_clear:
-      cleared: 'Кеш сброшен'
+      cleared: 'Кеш %{name} сброшен'
       error: "Ошибка: %{err}"
       no_id: "Не указан ID"
     hancock_touch:
