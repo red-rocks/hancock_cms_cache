@@ -6,8 +6,9 @@ module Hancock::Cache
           navigation_label I18n.t('hancock.cache')
 
           list do
+            field :enabled, :toggle
             field :is_html, :toggle
-            
+
             field :name_n_desc_n_parents
             # field :name_n_desc
             field :name do
@@ -56,6 +57,7 @@ module Hancock::Cache
           end
 
           edit do
+            field :enabled, :toggle
             field :name
             field :virtual_path
             field :is_html, :toggle
@@ -87,6 +89,7 @@ module Hancock::Cache
           end
 
           show do
+            field :enabled, :toggle
             field :name
             field :virtual_path
             field :is_html

@@ -11,9 +11,11 @@ module ActionView
             begin
               if Hancock::Cache.config.runtime_cache_detector
                 _name = Hancock::Cache::Fragment.name_from_view(name)
-                _desc = "" #"#{@virtual_path}\noptions: #{options}"
-                _virtual_path = @virtual_path
-                Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path)
+                if !respond_to?(:hancock_cache_fragments) or (frag = hancock_cache_fragments[_name]).nil? or !frag.enabled
+                  _desc = "" #"#{@virtual_path}\noptions: #{options}"
+                  _virtual_path = @virtual_path
+                  Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path)
+                end
               end
             rescue
             end
@@ -30,9 +32,11 @@ module ActionView
             begin
               if Hancock::Cache.config.runtime_cache_detector
                 _name = Hancock::Cache::Fragment.name_from_view(name)
-                _desc = "" #"#{virtual_path}\noptions: #{options}"
-                _virtual_path = virtual_path
-                Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path)
+                if !respond_to?(:hancock_cache_fragments) or (frag = hancock_cache_fragments[_name]).nil? or !frag.enabled
+                  _desc = "" #"#{virtual_path}\noptions: #{options}"
+                  _virtual_path = virtual_path
+                  Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path)
+                end
               end
             rescue
             end

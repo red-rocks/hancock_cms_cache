@@ -11,6 +11,18 @@ module Hancock::Cache
         index({last_clear_user_id: 1, last_clear_time: 1}, {background: true})
 
         field :name, type: String, localize: false, default: ""
+        scope :by_name, -> (_name) {
+          where(name: (_name and _name.strip))
+        }
+        scope :by_name_from_view, -> (_name) {
+          by_name("views/#{(_name and _name.strip)}")
+        }
+        scope :find_by_name, -> (_name) {
+          by_name(_name).first
+        }
+        scope :find_by_name_from_view, -> (_name) {
+          by_name_from_view((_name and _name.strip)).first
+        }
 
         field :desc, type: String, localize: Hancock::Cache.config.localize, default: ""
         field :virtual_path, type: String, localize: false, default: ""

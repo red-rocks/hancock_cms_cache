@@ -3,6 +3,9 @@ module Hancock::Cache
     module Fragment
       extend ActiveSupport::Concern
       include Hancock::Model
+      include Hancock::Enableable
+
+      include Hancock::Cache::Loadable
 
       include Hancock::Cache.orm_specific('Fragment')
 
@@ -55,9 +58,9 @@ module Hancock::Cache
           "views/#{_name}"
         end
 
-        def self.create_unless_exists(_name, _desc = nil, _virtual_path = nil, overwrite = :append)
+        def self.create_unless_exists(_name, _desc = nil, _virtual_path = "", overwrite = :append)
           if _name.is_a?(Hash)
-            _name, _desc, _virtual_path, overwrite = _name[:name], _name[:desc], _name[:_virtual_path], _name[:overwrite]
+            _name, _desc, _virtual_path, overwrite = _name[:name], _name[:desc], (_name[:_virtual_path] || ""), _name[:overwrite]
           end
 
           if _name.is_a?(Array)
@@ -75,7 +78,7 @@ module Hancock::Cache
                 case overwrite.to_sym
                 when :append
                   frag.desc = "\n#{_desc}" unless frag.desc == _desc
-                  frag.virtual_path += "\n#{_virtual_path}" unless frag.virtual_path == _virtual_path
+                  frag.virtual_path += "\n#{_virtual_path}" unless frag.virtual_path.strip == _virtual_path.strip
                   frag = frag.save and frag
                 when :overwrite
                   frag.desc = _desc

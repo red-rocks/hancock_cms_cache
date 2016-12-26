@@ -2,11 +2,12 @@ module Hancock::Cache::ClearedStack
   extend ActiveSupport::Concern
 
   included do
-    cattr_accessor :cleared_stack
-    LOCK = Mutex.new
+    @@cleared_stack = []
+    cattr_reader :cleared_stack
+    @@cleared_stack_mutex = Mutex.new
     def self.drop_cleared_stack
-      LOCK.synchronize do
-        self.cleared_stack = []
+      @@cleared_stack_mutex.synchronize do
+        @@cleared_stack = []
       end
     end
     def drop_cleared_stack
@@ -18,24 +19,24 @@ module Hancock::Cache::ClearedStack
     drop_cleared_stack
 
     def self.add_to_cleared_stack(key)
-      LOCK.synchronize do
-        self.cleared_stack ||= []
-        self.cleared_stack << key unless is_in_cleared_stack?(key)
+      @@cleared_stack_mutex.synchronize do
+        @@cleared_stack ||= []
+        @@cleared_stack << key unless is_in_cleared_stack?(key)
       end
     end
     def add_to_cleared_stack
       self.class.add_to_cleared_stack(self.name) unless self.is_in_cleared_stack?
     end
-    
+
     def first_in_cleared_stack?
-      self.class.cleared_stack and self.class.cleared_stack.first == self.name
+      @@cleared_stack and @@cleared_stack.first == self.name
     end
 
     def is_in_cleared_stack?
       self.class.is_in_cleared_stack?(self.name)
     end
     def self.is_in_cleared_stack?(key)
-      self.cleared_stack.include?(key)
+      @@cleared_stack.include?(key)
     end
   end
 
