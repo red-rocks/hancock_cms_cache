@@ -7,17 +7,8 @@ module Hancock::Cache
       include Hancock::Cache.orm_specific('Fragment')
 
       included do
-        cattr_accessor :cleared_stack
-        LOCK = Mutex.new
-        def self.drop_cleared_stack
-          LOCK.synchronize do
-            self.cleared_stack = []
-          end
-        end
-        def drop_cleared_stack
-          self.class.drop_cleared_stack
-        end
-        drop_cleared_stack
+
+        include Hancock::Cache::ClearedStack
 
         def self.rails_admin_name
           self.name.gsub("::", "~").underscore
@@ -35,32 +26,24 @@ module Hancock::Cache
         end
 
         def clear(forced_user = nil)
-          return nil if self.class.cleared_stack.include?(self.name)
+          return nil if self.is_in_cleared_stack?
           if self.set_last_clear_user(forced_user)
-            LOCK.synchronize do
-              Rails.cache.delete(self.name)
-              self.last_clear_time = Time.new
-              self.class.cleared_stack << self.name
-            end
+            Rails.cache.delete(self.name)
+            self.last_clear_time = Time.new
+            self.add_to_cleared_stack
             self.parents.each { |p| p.clear(forced_user) }
-            LOCK.synchronize do
-              self.class.drop_cleared_stack if self.class.cleared_stack.first == self.name
-            end
+            self.drop_cleared_stac_if_can
             self
           end
         end
         def clear!(forced_user = nil)
-          return nil if self.class.cleared_stack.include?(self.name)
+          return nil if self.is_in_cleared_stack?
           if self.set_last_clear_user(forced_user)
-            LOCK.synchronize do
-              Rails.cache.delete(self.name)
-              self.last_clear_time = Time.new
-              self.class.cleared_stack << self.name
-            end
-            self.parents.each { |p| p.clear!(forced_user) }
-            LOCK.synchronize do
-              self.class.drop_cleared_stack if self.class.cleared_stack.first == self.name
-            end
+            Rails.cache.delete(self.name)
+            self.last_clear_time = Time.new
+            self.add_to_cleared_stack
+            self.parents.each { |p| p.clear(forced_user) }
+            self.drop_cleared_stac_if_can
             self.save
           end
         end
