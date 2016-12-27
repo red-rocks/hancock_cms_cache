@@ -72,10 +72,18 @@ if Hancock.mongoid?
         selected_conditional_cache_keys.map { |k| k[:name] }
       end
 
+      def self.forced_cache_keys
+        []
+      end
+      def forced_cache_keys
+        self.class.forced_cache_keys
+      end
+
       def all_cache_keys(cached = true)
         # return @all_cache_keys if @all_cache_keys
         if cached
           @all_cache_keys = cache_keys || []
+          @all_cache_keys += forced_cache_keys
           @all_cache_keys += selected_conditional_cache_keys_names
           @all_cache_keys
         else
@@ -113,8 +121,8 @@ if Hancock.mongoid?
       after_destroy :clear_cache
       def clear_cache
         if perform_caching and !cache_cleared
-          # cache_keys and cache_keys.is_a?(Array) and cache_keys.each do |k|
-          all_cache_keys and all_cache_keys.is_a?(Array) and all_cache_keys.each do |k|
+          # (cache_keys and cache_keys.is_a?(Array) and cache_keys).compact.map(&:strip).uniq.each do |k|
+          (all_cache_keys and all_cache_keys.is_a?(Array) and all_cache_keys).compact.map(&:strip).uniq.each do |k|
             unless k.blank?
               k = k.strip
               if _frag = Hancock::Cache::Fragment.where(name: k).first

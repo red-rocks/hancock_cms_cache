@@ -98,49 +98,49 @@ module Hancock::Cache
           end
         end
 
-        def set_for_object(obj)
-          if obj.is_a?(Hash)
-            if obj[:model].present?
-              if obj[:ids].present?
-                return obj[:ids].map do |_id|
-                  set_for_setting({model: obj[:model], id: _id}) unless _id.blank?
-                end
-              else
-                if obj[:id].nil?
-                  return set_for_objects(obj[:model])
-                else
-                  obj = obj[:model].where(id: obj[:id]).first
-                end
-              end
-            else
-              return false
-            end
-
-          elsif obj.is_a?(Array)
-            return obj.map do |_obj|
-              set_for_object(_obj) unless _obj.blank?
-            end
-          end
-
-          if obj
-            if obj.is_a?(Class)
-              set_for_objects obj
-            else
-              unless obj.cache_keys.include?(self.name)
-                obj.set(cache_keys_str: (obj.cache_keys << self.name).uniq.join("\n"))
-                obj.reload
-              end
-            end
-          end
-        end
-        def set_for_objects(_class)
-          _class.all.map { |obj|
-            unless obj.cache_keys.include?(self.name)
-              obj.set(cache_keys_str: (obj.cache_keys << self.name).uniq.join("\n"))
-              obj.reload
-            end
-          }
-        end
+        # def set_for_object(obj)
+        #   if obj.is_a?(Hash)
+        #     if obj[:model].present?
+        #       if obj[:ids].present?
+        #         return obj[:ids].map do |_id|
+        #           set_for_object({model: obj[:model], id: _id}) unless _id.blank?
+        #         end
+        #       else
+        #         if obj[:id].nil?
+        #           return set_for_objects(obj[:model])
+        #         else
+        #           obj = obj[:model].where(id: obj[:id]).first
+        #         end
+        #       end
+        #     else
+        #       return false
+        #     end
+        #
+        #   elsif obj.is_a?(Array)
+        #     return obj.map do |_obj|
+        #       set_for_object(_obj) unless _obj.blank?
+        #     end
+        #   end
+        #
+        #   if obj
+        #     if obj.is_a?(Class)
+        #       set_for_objects obj
+        #     else
+        #       unless obj.cache_keys.include?(self.name)
+        #         obj.set(cache_keys_str: (obj.cache_keys << self.name).uniq.join("\n"))
+        #         obj.reload
+        #       end
+        #     end
+        #   end
+        # end
+        # def set_for_objects(_class)
+        #   _class.all.map { |obj|
+        #     unless obj.cache_keys.include?(self.name)
+        #       obj.set(cache_keys_str: (obj.cache_keys << self.name).uniq.join("\n"))
+        #       obj.reload
+        #     end
+        #   }
+        # end
 
         def self.set_for_setting(key_name, setting_obj)
           if key_name.is_a?(Array)
@@ -152,31 +152,31 @@ module Hancock::Cache
             _frag and _frag.set_for_setting setting_obj
           end
         end
-        def set_for_setting(setting_obj)
-          if defined?(RailsAdminModelSettings)
-            if setting_obj.is_a?(Hash)
-              unless setting_obj[:keys].present?
-                if setting_obj[:key].nil?
-                  return set_for_setting({ns: setting_obj[:ns], key: //})
-                else
-                  setting_obj = RailsAdminSettings::Setting.where(ns: setting_obj[:ns], key: setting_obj[:key]).first
-                end
-
-              else
-                return setting_obj[:keys].map do |k|
-                  set_for_setting({ns: setting_obj[:ns], key: k}) unless k.blank?
-                end
-              end
-
-            elsif setting_obj.is_a?(Array)
-              return setting_obj.map do |obj|
-                set_for_setting(obj) unless obj.blank?
-              end
-            end
-
-            setting_obj and set_for_object(setting_obj) and setting_obj.reload
-          end
-        end
+        # def set_for_setting(setting_obj)
+        #   if defined?(RailsAdminModelSettings)
+        #     if setting_obj.is_a?(Hash)
+        #       unless setting_obj[:keys].present?
+        #         if setting_obj[:key].nil?
+        #           return set_for_setting({ns: setting_obj[:ns], key: //})
+        #         else
+        #           setting_obj = RailsAdminSettings::Setting.where(ns: setting_obj[:ns], key: setting_obj[:key]).first
+        #         end
+        #
+        #       else
+        #         return setting_obj[:keys].map do |k|
+        #           set_for_setting({ns: setting_obj[:ns], key: k}) unless k.blank?
+        #         end
+        #       end
+        #
+        #     elsif setting_obj.is_a?(Array)
+        #       return setting_obj.map do |obj|
+        #         set_for_setting(obj) unless obj.blank?
+        #       end
+        #     end
+        #
+        #     setting_obj and set_for_object(setting_obj) and setting_obj.reload
+        #   end
+        # end
 
       end
 

@@ -136,19 +136,65 @@ module Hancock::Cache
         end
 
 
+        def set_for_object(obj)
+          obj and
+            obj.fields.keys.include?(:cache_keys_str) and
+            !obj.cache_keys.include?(self.name) and
+            obj.class.where(id: obj.id).update(cache_keys_str: "#{obj.cache_keys_str}\n#{self.name}".strip)
+        end
+        def set_for_objects(objs)
+          if objs
+            objs.map do |obj|
+              set_for_object(obj)
+            end
+          end
+        end
+        def set_for_model(model)
+          model and set_for_objects(model.not(cache_keys_str: /(^|\n)#{Regexp.escape self.name}(\n|$)/).all.to_a)
+          # model and set_for_objects(model.all.to_a)
+        end
+        def set_for_setting(setting_obj)
+          if defined?(RailsAdminModelSettings)
+            if setting_obj.is_a?(Hash)
+              unless setting_obj[:keys].present?
+                if setting_obj[:key].nil?
+                  return set_for_setting({ns: setting_obj[:ns], key: nil})
+                else
+                  # setting_obj = RailsAdminSettings::Setting.where(ns: setting_obj[:ns], key: setting_obj[:key]).not(cache_keys_str: /(^|\n)#{Regexp.escape self.name}(\n|$)/).first
+                  setting_obj = Settings.ns(setting_obj[:ns]).getnc(setting_obj[:key])
+                end
+
+              else
+                # setting_obj = RailsAdminSettings::Setting.where(ns: setting_obj[:ns], :key.in => setting_obj[:keys]).not(cache_keys_str: /(^|\n)#{Regexp.escape self.name}(\n|$)/).all.to_a
+                return setting_obj[:keys].map do |k|
+                  # set_for_setting({ns: setting_obj[:ns], key: k}) unless k.blank?
+                  set_for_setting(Settings.ns(setting_obj[:ns]).getnc(k)) unless k.blank?
+                end
+              end
+
+            elsif setting_obj.is_a?(Array)
+              return setting_obj.map do |obj|
+                set_for_setting(obj) unless obj.blank?
+              end
+            end
+
+            setting_obj and set_for_object(setting_obj) and setting_obj.reload
+          end
+        end
+
 
         def self.manager_can_add_actions
           ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_dump_snapshot, :hancock_cache_restore_snapshot]
           ret << :model_settings if Hancock::Cache.config.model_settings_support
-          ret << :model_accesses if Hancock::Cache.config.user_abilities_support
-          ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
+          # ret << :model_accesses if Hancock::Cache.config.user_abilities_support
+          # ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
           ret.freeze
         end
         def self.rails_admin_add_visible_actions
           ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_dump_snapshot, :hancock_cache_restore_snapshot]
           ret << :model_settings if Hancock::Cache.config.model_settings_support
           ret << :model_accesses if Hancock::Cache.config.user_abilities_support
-          ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
+          # ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
           ret.freeze
         end
 
