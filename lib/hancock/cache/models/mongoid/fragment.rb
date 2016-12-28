@@ -15,7 +15,7 @@ module Hancock::Cache
           where(name: (_name and _name.strip))
         }
         scope :by_name_from_view, -> (_name) {
-          by_name("views/#{(_name and _name.strip)}")
+          by_name(self.class.name_from_view(_name))
         }
         scope :find_by_name, -> (_name) {
           by_name(_name).first
@@ -36,7 +36,6 @@ module Hancock::Cache
         end
 
         has_and_belongs_to_many :parents, class_name: "Hancock::Cache::Fragment", inverse_of: nil
-
 
         def name_n_desc
           "#{self.name}<hr>#{self.desc}".html_safe

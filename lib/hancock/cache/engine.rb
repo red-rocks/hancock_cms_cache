@@ -4,7 +4,9 @@ module Hancock
       # isolate_namespace Hancock::Cache
 
       initializer "RailsAdminSettingsPatch (cache)" do
-        ::RailsAdminSettings::Setting.send(:include, Hancock::Cache::RailsAdminSettingsPatch)
+        if defined?(RailsAdminSettings)
+          ::RailsAdminSettings::Setting.send(:include, Hancock::Cache::RailsAdminSettingsPatch)
+        end
       end
 
     end

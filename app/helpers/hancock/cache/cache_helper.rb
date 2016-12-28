@@ -39,9 +39,24 @@ module Hancock
             frag.set_for_objects(for_objects) if for_objects
             frag.set_for_model(for_model) if for_model
             frag.set_for_setting(for_setting) if for_setting
+          else
+            if Hancock::Cache.config.runtime_cache_detector
+              _name = Hancock::Cache::Fragment.name_from_view(name)
+              _desc = "" #"#{@virtual_path}\noptions: #{options}"
+              _virtual_path = @virtual_path
+              Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path)
+              Hancock::Cache::Fragment.reload!
+            end
           end
           condition = (frag and frag.enabled)
         else
+          if Hancock::Cache.config.runtime_cache_detector
+            _name = Hancock::Cache::Fragment.name_from_view(name)
+            _desc = "" #"#{@virtual_path}\noptions: #{options}"
+            _virtual_path = @virtual_path
+            Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path)
+            Hancock::Cache::Fragment.reload!
+          end
           condition = Hancock::Cache::Fragment.enabled.by_name_from_view(name).count > 0
         end
         cache_if condition, name, options, &block

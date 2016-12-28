@@ -37,8 +37,12 @@ if Hancock.mongoid?
       def conditional_cache_keys
         [{}]
       end
+      def conditional_cache_keys_names
+        conditional_cache_keys.map { |k| k[:name] }.compact
+      end
       def selected_conditional_cache_keys
         conditional_cache_keys and conditional_cache_keys.select { |cache_key|
+          false if cache_key[:name].blank?
           cond_if, cond_unless = cache_key[:if], cache_key[:unless]
 
           if cond_if
@@ -72,8 +76,12 @@ if Hancock.mongoid?
         selected_conditional_cache_keys.map { |k| k[:name] }
       end
 
-      def self.forced_cache_keys
-        []
+      cattr_reader :forced_cache_keys
+      @forced_cache_keys = []
+
+      def self.add_forced_cache_key(key)
+        key = key.to_s
+        @forced_cache_keys << key unless @forced_cache_keys.include?(key)
       end
       def forced_cache_keys
         self.class.forced_cache_keys

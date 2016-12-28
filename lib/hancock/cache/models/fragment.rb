@@ -134,9 +134,22 @@ module Hancock::Cache
             file.write "  config.preloaded_fragments = [\n    #{Hancock::Cache::Fragment.get_as_json.join(",\n    ")}\n  ]\n  # Hancock::Cache::Fragment.load_from_preloaded\n  # Hancock::MODELS.map { |m| m.respond_to?(:set_default_cache_keys!) and m.set_default_cache_keys! }\nend"
           end
         end
+        def self.copy_new_preloaded_to_config_file(fname = "config/initializers/hancock_cache.rb")
+          File.truncate(fname, File.size(fname) - 4)
+          _text = Hancock::Cache::Fragment.where(:name.nin => Hancock::Cache.config.preloaded_fragments.map { |f|
+            f[:name]
+          }).all.to_a.map { |f|
+            f.get_as_json(false)
+          }.join(",\n    ")
+          File.open(fname, 'a') do |file|
+            file.write "  config.preloaded_fragments += [\n    #{_text}\n  ]\n  # Hancock::Cache::Fragment.load_from_preloaded\n  # Hancock::MODELS.map { |m| m.respond_to?(:set_default_cache_keys!) and m.set_default_cache_keys! }\nend"
+          end
+        end
 
 
         def set_for_object(obj)
+          return set_for_objects(obj) if obj.is_a?(::Array)
+          return set_for_model(obj.klass, true) if obj.is_a?(::Mongoid::Criteria)
           obj and
             obj.fields.keys.include?(:cache_keys_str) and
             !obj.cache_keys.include?(self.name) and
@@ -149,9 +162,23 @@ module Hancock::Cache
             end
           end
         end
-        def set_for_model(model)
-          model and set_for_objects(model.not(cache_keys_str: /(^|\n)#{Regexp.escape self.name}(\n|$)/).all.to_a)
+        def set_for_model(model, as_forced = false)
+          return set_for_models(model, as_forced) if model.is_a?(::Array)
+          if model
+            if as_forced and model.respond_to :add_forced_cache_key
+              model.send(:add_forced_cache_key, self.name) unless model.forced_cache_key.include?(self.name)
+            else
+              set_for_objects(model.not(cache_keys_str: /(^|\n)#{Regexp.escape self.name}(\n|$)/).all.to_a)
+            end
+          end
           # model and set_for_objects(model.all.to_a)
+        end
+        def set_for_models(models, as_forced = false)
+          if models
+            models.map do |model|
+              set_for_model(model)
+            end
+          end
         end
         def set_for_setting(setting_obj)
           if defined?(RailsAdminModelSettings)
