@@ -73,7 +73,7 @@ if Hancock.mongoid?
         } or []
       end
       def selected_conditional_cache_keys_names
-        selected_conditional_cache_keys.map { |k| k[:name] }
+        selected_conditional_cache_keys.map { |k| k[:name] }.compact
       end
 
       cattr_reader :forced_cache_keys
@@ -91,7 +91,7 @@ if Hancock.mongoid?
         # return @all_cache_keys if @all_cache_keys
         if cached
           @all_cache_keys = cache_keys || []
-          @all_cache_keys += forced_cache_keys
+          @all_cache_keys += (forced_cache_keys || [])
           @all_cache_keys += selected_conditional_cache_keys_names
           @all_cache_keys
         else
