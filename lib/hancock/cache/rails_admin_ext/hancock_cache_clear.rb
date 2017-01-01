@@ -66,7 +66,15 @@ module RailsAdmin
             end
 
             unless params['ajax'].present?
-              redirect_to index_path(model_name: @abstract_model)
+              begin
+                redirect_to :back
+              rescue
+                begin
+                  redirect_to index_path(model_name: @abstract_model, id: @object.id)
+                rescue
+                  redirect_to index_path(model_name: @abstract_model)
+                end
+              end
             end
 
           end

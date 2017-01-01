@@ -225,6 +225,14 @@ module Hancock::Cache
           ret.freeze
         end
 
+        after_touch :reload_fragments
+        after_save :reload_fragments
+        after_destroy :reload_fragments
+        protected
+        def reload_fragments
+          ApplicationController.reload_fragments
+        end
+
       end
 
     end
