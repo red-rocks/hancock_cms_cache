@@ -31,7 +31,7 @@ module RailsAdmin
               render action: @action.template_name
 
             elsif request.post?
-              case params[:type]
+              case params[:type].to_s
               when "global"
                 begin
                   Rails.cache.clear
@@ -41,9 +41,10 @@ module RailsAdmin
                 end
               when "fragments"
                 begin
-                  Hancock::Cache::Fragment.cutted.all.to_a.map do |f|
-                    f.clear!
-                  end
+                  # Hancock::Cache::Fragment.all.to_a.map do |f|
+                  #   f.clear!
+                  # end
+                  Hancock::Cache::Fragment.clear_all
                   flash[:success] = 'Кеш очищен'
                 rescue
                   flash[:error] = 'Ошибка'

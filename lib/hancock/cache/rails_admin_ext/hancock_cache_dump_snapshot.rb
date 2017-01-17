@@ -78,7 +78,7 @@ module RailsAdmin
         end
 
         register_instance_option :link_icon do
-          'icon-print'
+          'fa fa-save'
         end
 
         register_instance_option :pjax? do

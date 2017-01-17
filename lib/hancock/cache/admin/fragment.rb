@@ -78,7 +78,10 @@ module Hancock::Cache
               pretty_value do
                 bindings[:object].get_snapshot
               end
-              read_only true
+              read_only do
+                render_object = (bindings[:controller] || bindings[:view])
+                !(render_object and render_object.current_user.admin?)
+              end
             end
             field :last_dump_snapshot_time do
               read_only true

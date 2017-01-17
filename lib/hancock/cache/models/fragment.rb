@@ -35,7 +35,7 @@ module Hancock::Cache
             self.last_clear_time = Time.new
             self.add_to_cleared_stack
             self.parents.each { |p| p.clear(forced_user) }
-            self.drop_cleared_stac_if_can
+            self.drop_cleared_stack_if_can
             self
           end
         end
@@ -46,7 +46,7 @@ module Hancock::Cache
             self.last_clear_time = Time.new
             self.add_to_cleared_stack
             self.parents.each { |p| p.clear(forced_user) }
-            self.drop_cleared_stac_if_can
+            self.drop_cleared_stack_if_can
             self.save
           end
         end

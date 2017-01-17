@@ -13,7 +13,7 @@ module Hancock::Cache::ClearedStack
     def drop_cleared_stack
       self.class.drop_cleared_stack
     end
-    def drop_cleared_stac_if_can
+    def drop_cleared_stack_if_can
       self.class.drop_cleared_stack if self.first_in_cleared_stack?
     end
     drop_cleared_stack
