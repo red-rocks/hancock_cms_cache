@@ -209,6 +209,13 @@ module Hancock::Cache
           end
         end
 
+        def self.rails_admin_name_synonyms
+          "Кеш Кэш".freeze
+        end
+        def self.rails_admin_navigation_icon
+          ''.freeze
+        end
+
 
         def self.manager_can_add_actions
           ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_dump_snapshot, :hancock_cache_restore_snapshot]

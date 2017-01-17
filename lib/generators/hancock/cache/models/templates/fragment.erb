@@ -1,6 +1,13 @@
 class <%= camelcased_class_name %> < Hancock::Cache::Fragment
 
   ############ rails_admin ##############
+  def self.rails_admin_name_synonyms
+    "Кеш Кэш".freeze
+  end
+  def self.rails_admin_navigation_icon
+    ''.freeze
+  end
+
   def self.rails_admin_add_fields
     [] #super
   end
