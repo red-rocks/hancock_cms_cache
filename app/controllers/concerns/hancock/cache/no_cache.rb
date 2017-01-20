@@ -1,7 +1,7 @@
 module Hancock::Cache::NoCache
   extend ActiveSupport::Concern
   included do
-    before_filter :set_cache_buster
+    before_action :set_cache_buster
   end
 
   protected

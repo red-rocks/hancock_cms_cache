@@ -12,23 +12,34 @@ module Hancock::Cache
           field :label do
             visible false
             searchable true
+            weight 1
           end
           if Object.const_defined?('RailsAdminToggleable')
-            field :enabled, :toggle
+            field :enabled, :toggle do
+              weight 2
+            end
           else
-            field :enabled
+            field :enabled do
+              weight 2
+            end
           end
           field :ns do
             searchable true
+            weight 3
           end
           field :key do
             searchable true
+            weight 4
           end
-          field :name
+          field :name do
+            weight 5
+          end
           field :kind do
             searchable true
+            weight 6
           end
           field :raw do
+            weight 7
             searchable true
             pretty_value do
               if bindings[:object].file_kind?
@@ -41,6 +52,7 @@ module Hancock::Cache
             end
           end
           field :cache_keys_str, :text do
+            weight 6
             searchable true
           end
           if ::Settings.table_exists?
@@ -51,6 +63,7 @@ module Hancock::Cache
 
         edit do
           field :enabled, :toggle do
+            weight 1
             visible do
               if bindings[:object].for_admin?
                 render_object = (bindings[:controller] || bindings[:view])
@@ -61,12 +74,14 @@ module Hancock::Cache
             end
           end
           field :for_admin, :toggle do
+            weight 2
             visible do
               render_object = (bindings[:controller] || bindings[:view])
               render_object and (render_object.current_user.admin?)
             end
           end
           field :ns  do
+            weight 3
             read_only true
             help false
             visible do
@@ -75,6 +90,7 @@ module Hancock::Cache
             end
           end
           field :key  do
+            weight 4
             read_only true
             help false
             visible do
@@ -83,14 +99,17 @@ module Hancock::Cache
             end
           end
           field :label do
+            weight 5
             read_only true
             help false
           end
           field :kind do
+            weight 6
             read_only true
             help false
           end
           field :raw do
+            weight 7
             partial "setting_value".freeze
             visible do
               !bindings[:object].upload_kind?
@@ -106,6 +125,7 @@ module Hancock::Cache
           end
           if Settings.file_uploads_supported
             field :file, Settings.file_uploads_engine do
+              weight 8
               visible do
                 bindings[:object].upload_kind?
               end
@@ -121,6 +141,7 @@ module Hancock::Cache
           end
 
           group(:cache, &Hancock::Cache::Admin.caching_block do |_group|
+            _group.weight 9
             _group.visible do
               render_object = (bindings[:controller] || bindings[:view])
               render_object and render_object.current_user.admin?

@@ -1,7 +1,7 @@
 module Hancock::Cache::Fragments
   extend ActiveSupport::Concern
   included do
-    # before_filter :load_fragments
+    # before_action :load_fragments
 
     helper_method :hancock_cache_fragments
 
