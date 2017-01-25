@@ -155,3 +155,62 @@ module Hancock::Cache
 
   end
 end
+
+
+
+
+
+module RailsAdminSettings
+  class Namespaced
+
+    # returns setting object
+    def get(key, options = {})
+      key = key.to_s
+
+      _detect_cache = !(::Hancock::Cache::Fragment.rails_admin_settings_ns == name and key == "detecting")
+      _detect_cache &&= (::Hancock::Cache.config.runtime_cache_detector or ::Hancock::Cache::Fragment.settings.detecting)
+
+      load!
+
+      mutex.synchronize do
+        @locked = true
+
+        if _detect_cache
+          options[:cache_keys] ||= options.delete :cache_key
+          _cache_keys = options[:cache_keys]
+          if _cache_keys.nil?
+            # if _cache
+            #   options[:cache_keys_str] = name.underscore
+            # end
+          else
+            if _cache_keys.is_a?(::Array)
+              options[:cache_keys_str] = _cache_keys.map { |k| k.to_s }.join(" ")
+            else
+              options[:cache_keys_str] = _cache_keys.to_s
+            end
+          end
+          _cache_keys = (options[:cache_keys_str] ? options[:cache_keys_str].split(" ") : [])
+        end
+
+        v = @settings[key]
+        if v.nil?
+          unless @fallback.nil? || @fallback == @name
+            v = ::Settings.ns(@fallback).getnc(key)
+          end
+          if v.nil?
+            v = set(key, options[:default], options)
+          end
+        end
+
+        if _detect_cache and _cache_keys and !(_cache_keys - v.cache_keys).blank?
+          options[:cache_keys_str] = (_cache_keys + v.cache_keys).uniq.join(" ")
+          v = set(key, options[:default], options)
+        end
+
+        @locked = false
+        v
+      end
+    end
+
+  end
+end

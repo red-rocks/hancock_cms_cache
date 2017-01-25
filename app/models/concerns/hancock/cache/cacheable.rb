@@ -76,15 +76,15 @@ if Hancock.mongoid?
         selected_conditional_cache_keys.map { |k| k[:name] }.compact
       end
 
-      cattr_reader :forced_cache_keys
-      @forced_cache_keys = []
+      class_attribute :forced_cache_keys
+      self.forced_cache_keys ||= []
 
       def self.add_forced_cache_key(key)
         key = key.to_s
-        @forced_cache_keys << key unless @forced_cache_keys.include?(key)
+        self.forced_cache_keys << key unless self.forced_cache_keys.include?(key)
       end
-      def forced_cache_keys
-        self.class.forced_cache_keys
+      def self.remove_forced_cache_key(key)
+        self.forced_cache_keys.delete(key.to_s)
       end
 
       def all_cache_keys(cached = true)

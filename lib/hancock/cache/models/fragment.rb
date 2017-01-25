@@ -25,7 +25,7 @@ module Hancock::Cache
         #   self.last_clear_user = forced_user if forced_user
         # end
         def set_last_clear_user!(forced_user = nil)
-          self.set_last_clear_user(forced_user) and self.save
+          self.set_last_clear_user(f_nameorced_user) and self.save
         end
 
         def clear(forced_user = nil)
@@ -55,12 +55,16 @@ module Hancock::Cache
           self.name = name_from_view(_name)
         end
         def self.name_from_view(_name)
-          "views/#{_name}"
+          if _name.is_a?(Array)
+            _name.map { |n| name_from_view(n) }
+          else
+            "views/#{_name}"
+          end
         end
 
         def self.create_unless_exists(_name, _desc = nil, _virtual_path = "", overwrite = :append)
           if _name.is_a?(Hash)
-            _name, _desc, _virtual_path, overwrite = _name[:name], _name[:desc], (_name[:_virtual_path] || ""), _name[:overwrite]
+            _name, _desc, _virtual_path, overwrite, parents = _name[:name], _name[:desc], (_name[:_virtual_path] || ""), _name[:overwrite], _name[:parents]
           end
 
           if _name.is_a?(Array)
@@ -71,7 +75,16 @@ module Hancock::Cache
 
           unless _name.blank?
             if Hancock::Cache::Fragment.where(name: _name).count == 0
-              frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc, virtual_path: _virtual_path)
+              if parents
+                if parents.first.is_a?(String)
+                  parents = Hancock::Cache::Fragments.by_name(parents).pluck(:_id)
+                else
+                  parents = parents.map(&:_id)
+                end
+                parents.uniq!
+                parents.compact!
+              end
+              frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc, virtual_path: _virtual_path, parent_ids: parents)
             else
               frag = Hancock::Cache::Fragment.where(name: _name).first
               if overwrite.is_a?(Symbol) or overwrite.is_a?(String)
@@ -79,23 +92,52 @@ module Hancock::Cache
                 when :append
                   frag.desc = "\n#{_desc}" unless frag.desc == _desc
                   frag.virtual_path += "\n#{_virtual_path}" unless frag.virtual_path.strip == _virtual_path.strip
+                  if parents
+                    if parents.first.is_a?(String)
+                      frag.parent_ids += Hancock::Cache::Fragments.by_name(parents).pluck(:_id)
+                    else
+                      frag.parent_ids += parents.map(&:_id)
+                    end
+                    frag.parent_ids.uniq!
+                    frag.parent_ids.compact!
+                  end
                   frag = frag.save and frag
+
                 when :overwrite
                   frag.desc = _desc
                   frag.virtual_path = _desc
+                  if parents
+                    if parents.first.is_a?(String)
+                      frag.parent_ids = Hancock::Cache::Fragments.by_name(parents).pluck(:_id)
+                    else
+                      frag.parent_ids = parents.map(&:_id)
+                    end
+                    frag.parent_ids.uniq!
+                    frag.parent_ids.compact!
+                  end
                   frag = frag.save and frag
+
                 else
-                end
-              else
-                if overwrite
-                  frag.desc = _desc
-                  frag.virtual_path = _desc
-                  frag = frag.save and frag
-                end
-              end
-            end
+                  if overwrite
+                    frag.desc = _desc
+                    frag.virtual_path = _desc
+                    if parents
+                      if parents.first.is_a?(String)
+                        frag.parent_ids = Hancock::Cache::Fragments.by_name(parents).pluck(:_id)
+                      else
+                        frag.parent_ids = parents.map(&:_id)
+                      end
+                      frag.parent_ids.uniq!
+                      frag.parent_ids.compact!
+                    end
+                    frag = frag.save and frag
+                  end
+                end #case overwrite.to_sym
+              end #if overwrite.is_a?(Symbol) or overwrite.is_a?(String)
+            end #if Hancock::Cache::Fragment.where(name: _name).count == 0
+
             frag
-          end
+          end #unless _name.blank?
         end
 
         def self.load_from_preloaded
@@ -114,6 +156,7 @@ module Hancock::Cache
             name: self.name,
             desc: self.desc,
             virtual_path: self.virtual_path,
+            parents: self.parents.map(&:name),
             overwrite: overwrite
           }.compact
         end
@@ -237,7 +280,9 @@ module Hancock::Cache
         after_destroy :reload_fragments
         protected
         def reload_fragments
-          ApplicationController.reload_fragments
+          if ApplicationController.respond_to?(:reload_fragments)
+            ApplicationController.reload_fragments
+          end
         end
 
       end

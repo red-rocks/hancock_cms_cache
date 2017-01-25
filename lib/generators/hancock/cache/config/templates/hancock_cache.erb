@@ -10,5 +10,5 @@ Hancock::Cache.configure do |config|
   #   {name: 'keyname', desc: 'desc', overwrite: true},
   #   {name: 'no overwrited key', desc: 'desc', overwrite: false}
   # ]
-  # config.preloaded_fragments << {name: 'somekey'}
+  # config.preloaded_fragments << {name: 'somekey', parents: ['keyname']}
 end

@@ -12,16 +12,20 @@ module Hancock::Cache
 
         field :name, type: String, localize: false, default: ""
         scope :by_name, -> (_name) {
-          where(name: (_name and _name.strip))
+          if _name.is_a?(Array)
+            where(:name.in => _name.compact.map(&:strip))
+          else
+            where(name: (_name and _name.strip))
+          end
         }
         scope :by_name_from_view, -> (_name) {
-          by_name(self.class.name_from_view(_name))
+          by_name(self.name_from_view(_name))
         }
         scope :find_by_name, -> (_name) {
           by_name(_name).first
         }
         scope :find_by_name_from_view, -> (_name) {
-          by_name_from_view((_name and _name.strip)).first
+          by_name_from_view(_name).first
         }
 
         field :desc, type: String, localize: Hancock::Cache.config.localize, default: ""
