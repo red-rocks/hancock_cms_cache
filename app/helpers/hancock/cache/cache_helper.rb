@@ -32,7 +32,11 @@ module Hancock
         for_model   = (options and options.delete(:for_model))
         for_setting = (options and options.delete(:for_setting))
 
-        _detect_cache = Hancock::Cache::Fragment.settings.detecting || Hancock::Cache.config.runtime_cache_detector
+        if Hancock::Cache.model_settings_support
+          _detect_cache = Hancock::Cache::Fragment.settings.detecting || Hancock::Cache.config.runtime_cache_detector
+        else
+          _detect_cache = Settings.hancock_cache_detecting || Hancock::Cache.config.runtime_cache_detector
+        end
 
         if respond_to?(:hancock_cache_fragments)
           frag = hancock_cache_fragments[Hancock::Cache::Fragment.name_from_view(name)]

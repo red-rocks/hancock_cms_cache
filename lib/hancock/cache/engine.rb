@@ -32,11 +32,11 @@ module Hancock
               end
 
             else
-              _setting_existed = !Settings.getnc('hancock_pages_blocks_whitelist').nil?
+              _setting_existed = !Settings.getnc('hancock_cache_detecting').nil?
               unless _setting_existed
-                Settings.hancock_pages_blocks_whitelist(kind: :boolean, default: false, label: "Включить режим построения дерева кэша.", cache_keys: [])
+                Settings.hancock_cache_detecting(kind: :boolean, default: false, label: "Включить режим построения дерева кэша.", cache_keys: [])
                 Settings.unload!
-                _setting = Settings.getnc('hancock_pages_blocks_whitelist')
+                _setting = Settings.getnc('hancock_cache_detecting')
                 if _setting
                   _setting.for_admin = true
                   _setting.perform_caching = false
