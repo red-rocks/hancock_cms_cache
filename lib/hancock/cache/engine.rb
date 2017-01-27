@@ -18,16 +18,32 @@ module Hancock
       initializer 'CacheFragmentsDetector Setting' do
         begin
           if Settings and Settings.table_exists?
-            _setting_existed = !Hancock::Cache::Fragment.settings.getnc('detecting').nil?
-            unless _setting_existed
-              Hancock::Cache::Fragment.settings.detecting(kind: :boolean, default: false, label: "Включить режим построения дерева кэша.", cache_keys: [])
-              Hancock::Cache::Fragment.settings.unload!
-              _setting = Hancock::Cache::Fragment.settings.getnc('detecting')
-              if _setting
-                _setting.for_admin = true
-                _setting.perform_caching = false
-                _setting.save
+            if Hancock::Cache.model_settings_support
+              _setting_existed = !Hancock::Cache::Fragment.settings.getnc('detecting').nil?
+              unless _setting_existed
+                Hancock::Cache::Fragment.settings.detecting(kind: :boolean, default: false, label: "Включить режим построения дерева кэша.", cache_keys: [])
+                Hancock::Cache::Fragment.settings.unload!
+                _setting = Hancock::Cache::Fragment.settings.getnc('detecting')
+                if _setting
+                  _setting.for_admin = true
+                  _setting.perform_caching = false
+                  _setting.save
+                end
               end
+
+            else
+              _setting_existed = !Settings.getnc('hancock_pages_blocks_whitelist').nil?
+              unless _setting_existed
+                Settings.hancock_pages_blocks_whitelist(kind: :boolean, default: false, label: "Включить режим построения дерева кэша.", cache_keys: [])
+                Settings.unload!
+                _setting = Settings.getnc('hancock_pages_blocks_whitelist')
+                if _setting
+                  _setting.for_admin = true
+                  _setting.perform_caching = false
+                  _setting.save
+                end
+              end
+
             end
           end
         rescue

@@ -168,7 +168,11 @@ module RailsAdminSettings
       key = key.to_s
 
       _detect_cache = !(::Hancock::Cache::Fragment.rails_admin_settings_ns == name and key == "detecting")
-      _detect_cache &&= (::Hancock::Cache.config.runtime_cache_detector or ::Hancock::Cache::Fragment.settings.detecting)
+      if Hancock::Cache.model_settings_support
+        _detect_cache &&= (::Hancock::Cache.config.runtime_cache_detector or ::Hancock::Cache::Fragment.settings.detecting)
+      else
+        _detect_cache &&= (::Hancock::Cache.config.runtime_cache_detector or Settings.hancock_cache_detecting)
+      end
 
       load!
 
