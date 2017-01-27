@@ -64,7 +64,7 @@ module RailsAdmin
 
             unless params['ajax'].present?
               begin
-                redirect_to :back
+                redirect_back(fallback_location: dashboard_path)
               rescue
                 begin
                   redirect_to index_path(model_name: @abstract_model, id: @object.id)
