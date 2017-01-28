@@ -3,7 +3,7 @@ module Hancock::Cache
     extend ActiveSupport::Concern
 
     included do
-      include Hancock::Cache::Cacheable
+      include ::Hancock::Cache::Cacheable
 
       rails_admin do
         navigation_label I18n.t('admin.settings.label')
@@ -140,7 +140,7 @@ module Hancock::Cache
             end
           end
 
-          group(:cache, &Hancock::Cache::Admin.caching_block do |_group|
+          group(:cache, &::Hancock::Cache::Admin.caching_block do |_group|
             _group.weight 9
             _group.visible do
               render_object = (bindings[:controller] || bindings[:view])
@@ -168,7 +168,7 @@ module RailsAdminSettings
       key = key.to_s
 
       _detect_cache = !(::Hancock::Cache::Fragment.rails_admin_settings_ns == name and key == "detecting")
-      if Hancock::Cache.model_settings_support
+      if ::Hancock::Cache.config.model_settings_support
         _detect_cache &&= (::Hancock::Cache.config.runtime_cache_detector or ::Hancock::Cache::Fragment.settings.detecting)
       else
         _detect_cache &&= (::Hancock::Cache.config.runtime_cache_detector or Settings.hancock_cache_detecting)

@@ -18,7 +18,7 @@ module Hancock
       initializer 'CacheFragmentsDetector Setting' do
         begin
           if Settings and Settings.table_exists?
-            if Hancock::Cache.model_settings_support
+            if Hancock::Cache.config.model_settings_support
               _setting_existed = !Hancock::Cache::Fragment.settings.getnc('detecting').nil?
               unless _setting_existed
                 Hancock::Cache::Fragment.settings.detecting(kind: :boolean, default: false, label: "Включить режим построения дерева кэша.", cache_keys: [])
