@@ -1,6 +1,7 @@
 module Hancock::Cache::Fragments
   extend ActiveSupport::Concern
   included do
+    @@hancock_cache_fragments = nil
     # before_action :load_fragments
 
     helper_method :hancock_cache_fragments
@@ -15,7 +16,7 @@ module Hancock::Cache::Fragments
     if reload
       Hancock::Cache::Fragment.reload!
       @@hancock_cache_fragments = Hancock::Cache::Fragment.loaded_info
-    elseif Hancock::Cache::Fragment.loaded
+    elsif Hancock::Cache::Fragment.loaded
       @@hancock_cache_fragments ||= Hancock::Cache::Fragment.loaded_info
     else
       Hancock::Cache::Fragment.load!

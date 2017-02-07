@@ -131,19 +131,22 @@ module Hancock
 
       def hancock_cache_keys
         ret = lookup_context.hancock_cache_keys.dup
+
         if respond_to?(:page_cache_key) and !page_cache_key.blank?
-          _name = page_cache_key
-          _desc = <<-TEXT
-            action caching
-            controller: #{controller_name}
-            action: #{action_name}
-            params: #{params.inspect}
-          TEXT
-          Hancock::Cache::Fragment.create_unless_exists(name: Hancock::Cache::Fragment.name_from_view(_name), desc: _desc)
+          if (!respond_to?(:page_cache_obj) or page_cache_obj.nil?)
+            _name = page_cache_key
+            _desc = <<-TEXT
+              action caching
+              controller: #{controller_name}
+              action: #{action_name}
+              params: #{params.inspect}
+            TEXT
+            Hancock::Cache::Fragment.create_unless_exists(name: Hancock::Cache::Fragment.name_from_view(_name), desc: _desc)
+          end
           ret.unshift page_cache_key
         end
 
-        ret.freeze
+        ret.uniq.freeze
       end
 
       def hancock_cache_views_keys
