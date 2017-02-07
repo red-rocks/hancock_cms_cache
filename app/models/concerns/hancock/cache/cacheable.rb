@@ -123,6 +123,16 @@ if Hancock.mongoid?
         Hancock::Cache::Fragment.where(:name.in => all_cache_keys(false))
       end
 
+      def reset_cache_keys
+        self.cache_keys = cache_fragments.pluck(:name)
+      end
+      def reset_cache_keys!
+        self.reset_cache_keys and self.save
+      end
+      def self.reset_cache_keys!
+        self.all.map(&:reset_cache_keys!)
+      end
+
       attr_accessor :cache_cleared
 
       after_touch :clear_cache

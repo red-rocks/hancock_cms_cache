@@ -77,7 +77,7 @@ module Hancock::Cache
             if Hancock::Cache::Fragment.where(name: _name).count == 0
               if parents
                 if parents.first.is_a?(String)
-                  parents = Hancock::Cache::Fragments.by_name(parents).pluck(:_id)
+                  parents = Hancock::Cache::Fragment.by_name(parents).pluck(:_id)
                 else
                   parents = parents.map(&:_id)
                 end
@@ -94,7 +94,7 @@ module Hancock::Cache
                   frag.virtual_path += "\n#{_virtual_path}" unless frag.virtual_path.strip == _virtual_path.strip
                   if parents
                     if parents.first.is_a?(String)
-                      frag.parent_ids += Hancock::Cache::Fragments.by_name(parents).pluck(:_id)
+                      frag.parent_ids += Hancock::Cache::Fragment.by_name(parents).pluck(:_id)
                     else
                       frag.parent_ids += parents.map(&:_id)
                     end
@@ -108,7 +108,7 @@ module Hancock::Cache
                   frag.virtual_path = _desc
                   if parents
                     if parents.first.is_a?(String)
-                      frag.parent_ids = Hancock::Cache::Fragments.by_name(parents).pluck(:_id)
+                      frag.parent_ids = Hancock::Cache::Fragment.by_name(parents).pluck(:_id)
                     else
                       frag.parent_ids = parents.map(&:_id)
                     end
@@ -123,7 +123,7 @@ module Hancock::Cache
                     frag.virtual_path = _desc
                     if parents
                       if parents.first.is_a?(String)
-                        frag.parent_ids = Hancock::Cache::Fragments.by_name(parents).pluck(:_id)
+                        frag.parent_ids = Hancock::Cache::Fragment.by_name(parents).pluck(:_id)
                       else
                         frag.parent_ids = parents.map(&:_id)
                       end
@@ -194,7 +194,7 @@ module Hancock::Cache
           return set_for_objects(obj) if obj.is_a?(::Array)
           return set_for_model(obj.klass, true) if obj.is_a?(::Mongoid::Criteria)
           obj and
-            obj.fields.keys.include?(:cache_keys_str) and
+            obj.fields.keys.include?(:cache_keys_str) and obj.respond_to?(:cache_keys) and
             !obj.cache_keys.include?(self.name) and
             obj.class.where(id: obj.id).update(cache_keys_str: "#{obj.cache_keys_str}\n#{self.name}".strip)
         end

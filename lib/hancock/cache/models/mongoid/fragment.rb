@@ -15,7 +15,11 @@ module Hancock::Cache
           if _name.is_a?(Array)
             where(:name.in => _name.compact.map(&:strip))
           else
-            where(name: (_name and _name.strip))
+            if _name.is_a?(String)
+              where(name: (_name and _name.strip))
+            else
+              where(name: _name)
+            end
           end
         }
         scope :by_name_from_view, -> (_name) {
@@ -40,6 +44,41 @@ module Hancock::Cache
         end
 
         has_and_belongs_to_many :parents, class_name: "Hancock::Cache::Fragment", inverse_of: nil
+        field :parent_names, type: Array, default: []
+        def set_parent_names
+          self.parent_names = self.parents.pluck(:name)
+        end
+        def set_parent_names!
+          self.set_parent_names and self.save
+        end
+        def update_parent_names!
+          self.set_parent_names and self.class.where(id: self.id).update(parent_names: self.parent_names)
+        end
+        before_save do
+          if self.parent_ids_changed?
+            self.set_parent_names
+          end
+          self
+        end
+        def set_parent_ids
+          self.parent_ids = self.class.by_name(self.parent_names).pluck(:_id) unless self.parent_names.blank?
+        end
+        def set_parent_ids!
+          self.set_parent_ids and self.save
+        end
+        def update_parent_ids!
+          self.set_parent_ids and self.class.where(id: self.id).update(parent_ids: self.parent_ids, parent_names: self.parent_names)
+        end
+
+        def reset_parents
+          self.parent_ids = self.parents.pluck(:_id)
+        end
+        def reset_parents!
+          self.reset_parents and self.save
+        end
+        def self.reset_parents!
+          self.all.map(&:reset_parents!)
+        end
 
         def name_n_desc
           "#{self.name}<hr>#{self.desc}".html_safe

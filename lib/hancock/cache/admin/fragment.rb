@@ -98,6 +98,12 @@ module Hancock::Cache
             field :is_html
             field :desc
             field :parents
+            field :parent_names do
+              visible do
+                render_object = (bindings[:controller] || bindings[:view])
+                (render_object and render_object.current_user.admin?)
+              end
+            end
             field :last_clear_time
             field :last_clear_user
             field :data
