@@ -5,6 +5,21 @@ module Hancock::Cache
     included do
       include ::Hancock::Cache::Cacheable
 
+      def full_cached?
+        self.cache_fragments.enabled.count == self.cache_keys.count
+      end
+
+      def reset_loadable
+        self.loadable = !self.full_cached?
+      end
+      def reset_loadable!
+        self.reset_loadable
+        self.save
+      end
+      def self.reset_loadable!
+        self.all.map(&:reset_loadable!)
+      end
+
       rails_admin do
         navigation_label I18n.t('admin.settings.label')
 
