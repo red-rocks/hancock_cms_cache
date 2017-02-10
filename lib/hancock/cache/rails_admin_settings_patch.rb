@@ -6,7 +6,7 @@ module Hancock::Cache
       include ::Hancock::Cache::Cacheable
 
       def full_cached?
-        self.cache_fragments.enabled.count == self.cache_keys.count
+        self.cache_keys.count > 0 and self.cache_keys.count == self.cache_fragments.enabled.count
       end
 
       def reset_loadable
