@@ -6,9 +6,6 @@ module Hancock
         if key.is_a?(Hash)
           key, options = key[:key], key
         end
-        ns = options.delete(:ns)
-        key ||= options.delete(:key)
-        options.delete(:key)
 
         cache_keys = options[:cache_keys_str] || options[:cache_keys] || options[:cache_key] || []
         if cache_keys.is_a?(::Array)
