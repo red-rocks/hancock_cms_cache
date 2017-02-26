@@ -124,7 +124,7 @@ if Hancock.mongoid?
       end
 
       def reset_cache_keys
-        self.cache_keys = cache_fragments.pluck(:name)
+        self.cache_keys = cache_fragments.distinct(:name)
       end
       def reset_cache_keys!
         self.reset_cache_keys and self.save

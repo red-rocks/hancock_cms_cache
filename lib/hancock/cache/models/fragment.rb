@@ -77,12 +77,10 @@ module Hancock::Cache
             if Hancock::Cache::Fragment.where(name: _name).count == 0
               if parents
                 if parents.first.is_a?(String)
-                  parents = Hancock::Cache::Fragment.by_name(parents).pluck(:_id)
+                  parents = Hancock::Cache::Fragment.by_name(parents).distinct(:_id)
                 else
-                  parents = parents.map(&:_id)
+                  parents = parents.map(&:_id).uniq.compact
                 end
-                parents.uniq!
-                parents.compact!
               end
               frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc, virtual_path: _virtual_path, parent_ids: parents)
             else
@@ -94,12 +92,10 @@ module Hancock::Cache
                   frag.virtual_path += "\n#{_virtual_path}" unless frag.virtual_path.strip == _virtual_path.strip
                   if parents
                     if parents.first.is_a?(String)
-                      frag.parent_ids += Hancock::Cache::Fragment.by_name(parents).pluck(:_id)
+                      frag.parent_ids += Hancock::Cache::Fragment.by_name(parents).distinct(:_id)
                     else
-                      frag.parent_ids += parents.map(&:_id)
+                      frag.parent_ids += parents.map(&:_id).uniq.compact
                     end
-                    frag.parent_ids.uniq!
-                    frag.parent_ids.compact!
                   end
                   frag = frag.save and frag
 
@@ -108,7 +104,7 @@ module Hancock::Cache
                   frag.virtual_path = _desc
                   if parents
                     if parents.first.is_a?(String)
-                      frag.parent_ids = Hancock::Cache::Fragment.by_name(parents).pluck(:_id)
+                      frag.parent_ids = Hancock::Cache::Fragment.by_name(parents).distinct(:_id)
                     else
                       frag.parent_ids = parents.map(&:_id)
                     end
@@ -123,12 +119,10 @@ module Hancock::Cache
                     frag.virtual_path = _desc
                     if parents
                       if parents.first.is_a?(String)
-                        frag.parent_ids = Hancock::Cache::Fragment.by_name(parents).pluck(:_id)
+                        frag.parent_ids = Hancock::Cache::Fragment.by_name(parents).distinct(:_id)
                       else
-                        frag.parent_ids = parents.map(&:_id)
+                        frag.parent_ids = parents.map(&:_id).uniq.compact
                       end
-                      frag.parent_ids.uniq!
-                      frag.parent_ids.compact!
                     end
                     frag = frag.save and frag
                   end

@@ -46,7 +46,7 @@ module Hancock::Cache
         has_and_belongs_to_many :parents, class_name: "Hancock::Cache::Fragment", inverse_of: nil
         field :parent_names, type: Array, default: []
         def set_parent_names
-          self.parent_names = self.parents.pluck(:name)
+          self.parent_names = self.parents.distinct(:name)
         end
         def set_parent_names!
           self.set_parent_names and self.save
@@ -61,7 +61,7 @@ module Hancock::Cache
           self
         end
         def set_parent_ids
-          self.parent_ids = self.class.by_name(self.parent_names).pluck(:_id) unless self.parent_names.blank?
+          self.parent_ids = self.class.by_name(self.parent_names).distinct(:_id) unless self.parent_names.blank?
         end
         def set_parent_ids!
           self.set_parent_ids and self.save
@@ -71,7 +71,7 @@ module Hancock::Cache
         end
 
         def reset_parents
-          self.parent_ids = self.parents.pluck(:_id)
+          self.parent_ids = self.parents.distinct(:_id)
         end
         def reset_parents!
           self.reset_parents and self.save
