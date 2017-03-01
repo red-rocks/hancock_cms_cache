@@ -26,7 +26,7 @@ module Hancock::Cache
         list do
           field :label do
             visible false
-            searchable true
+            searchable true 
             weight 1
           end
           field :enabled, :toggle do
@@ -125,9 +125,16 @@ module Hancock::Cache
             end
             help false
           end
-          field :kind do
+          field :kind, :enum do
             weight 7
-            read_only true
+            read_only do
+              render_object = (bindings[:controller] || bindings[:view])
+              !render_object or !(render_object.current_user.admin?)
+            end
+            enum do
+              RailsAdminSettings.kinds
+            end
+            partial "enum_for_settings_kinds".freeze
             help false
           end
           field :raw do
