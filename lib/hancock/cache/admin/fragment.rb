@@ -7,6 +7,7 @@ module Hancock::Cache
 
           list do
             field :enabled, :toggle
+            field :on_ram, :toggle
             field :is_html, :toggle
 
             field :name_n_desc_n_parents
@@ -58,6 +59,7 @@ module Hancock::Cache
 
           edit do
             field :enabled, :toggle
+            field :on_ram, :toggle
             field :name
             field :virtual_path
             field :is_html, :toggle
@@ -93,6 +95,7 @@ module Hancock::Cache
 
           show do
             field :enabled, :toggle
+            field :on_ram, :toggle
             field :name
             field :virtual_path
             field :is_html

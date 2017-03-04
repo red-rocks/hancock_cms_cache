@@ -101,6 +101,7 @@ module Hancock::Cache
                       frag.parent_ids += parents.map(&:_id).uniq.compact
                     end
                   end
+                  frag.on_ram = on_ram
                   frag = frag.save and frag
 
                 when :overwrite
@@ -115,22 +116,23 @@ module Hancock::Cache
                     frag.parent_ids.uniq!
                     frag.parent_ids.compact!
                   end
+                  frag.on_ram = on_ram
                   frag = frag.save and frag
-
-                else
-                  if overwrite
-                    frag.desc = _desc
-                    frag.virtual_path = _desc
-                    if parents
-                      if parents.first.is_a?(String)
-                        frag.parent_ids = Hancock::Cache::Fragment.by_name(parents).distinct(:_id)
-                      else
-                        frag.parent_ids = parents.map(&:_id).uniq.compact
-                      end
-                    end
-                    frag = frag.save and frag
-                  end
                 end #case overwrite.to_sym
+              else
+                if overwrite
+                  frag.desc = _desc
+                  frag.virtual_path = _desc
+                  if parents
+                    if parents.first.is_a?(String)
+                      frag.parent_ids = Hancock::Cache::Fragment.by_name(parents).distinct(:_id)
+                    else
+                      frag.parent_ids = parents.map(&:_id).uniq.compact
+                    end
+                  end
+                  frag.on_ram = on_ram
+                  frag = frag.save and frag
+                end
               end #if overwrite.is_a?(Symbol) or overwrite.is_a?(String)
             end #if Hancock::Cache::Fragment.where(name: _name).count == 0
 
