@@ -56,6 +56,7 @@ module Hancock
         for_objects = (options and options.delete(:for_objects))
         for_model   = (options and options.delete(:for_model))
         for_setting = (options and options.delete(:for_setting))
+        _on_ram     = (options and options.delete(:on_ram))
 
         # if Hancock::Cache.config.model_settings_support
         #   _detect_cache = !!(Hancock::Cache.config.runtime_cache_detector || Hancock::Cache::Fragment.settings.detecting)
@@ -88,8 +89,9 @@ module Hancock
               _desc = "" #"#{@virtual_path}\noptions: #{options}"
               _virtual_path = @virtual_path
               # Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path, parents: parents)
-              Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path, parent_names: parent_names)
+              Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path, parent_names: parent_names, on_ram: _on_ram)
               Hancock::Cache::Fragment.reload!
+              frag = hancock_cache_fragments[_name]
             end
           end
           condition = (frag and frag.enabled)
@@ -109,9 +111,14 @@ module Hancock
           end
           condition = Hancock::Cache::Fragment.enabled.by_name_from_view(name).count > 0
         end
-        lookup_context.hancock_cache_keys << name
-        ret = cache_if condition, name, options, &block
-        lookup_context.hancock_cache_keys.delete(name)
+        if frag and frag.on_ram and !frag.on_ram_data.nil?
+          ret = frag.on_ram_data
+        else
+          lookup_context.hancock_cache_keys << name
+          ret = cache_if condition, name, options, &block
+          frag.on_ram_data = ret if frag and frag.on_ram
+          lookup_context.hancock_cache_keys.delete(name)
+        end
         return ret
       end
       def hancock_fragment_cache_unless(condition, obj = [], options = nil, &block)

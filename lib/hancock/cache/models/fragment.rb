@@ -32,6 +32,7 @@ module Hancock::Cache
           return nil if self.is_in_cleared_stack?
           if self.set_last_clear_user(forced_user)
             Rails.cache.delete(self.name)
+            self.on_ram_data = nil
             self.last_clear_time = Time.new
             self.add_to_cleared_stack
             self.parents.each { |p| p.clear(forced_user) }
@@ -43,6 +44,7 @@ module Hancock::Cache
           return nil if self.is_in_cleared_stack?
           if self.set_last_clear_user(forced_user)
             Rails.cache.delete(self.name)
+            self.on_ram_data = nil
             self.last_clear_time = Time.new
             self.add_to_cleared_stack
             self.parents.each { |p| p.clear(forced_user) }
@@ -64,8 +66,10 @@ module Hancock::Cache
 
         def self.create_unless_exists(_name, _desc = nil, _virtual_path = "", overwrite = :append)
           if _name.is_a?(Hash)
-            _name, _desc, _virtual_path, overwrite, parents = _name[:name], _name[:desc], (_name[:_virtual_path] || ""), _name[:overwrite], _name[:parents]
+            _name, _desc, _virtual_path, overwrite, parents, on_ram =
+            _name[:name], _name[:desc], (_name[:_virtual_path] || ""), _name[:overwrite], _name[:parents], _name[:on_ram]
           end
+          on_ram ||= false
 
           if _name.is_a?(Array)
             return _name.map do |n|
@@ -82,7 +86,7 @@ module Hancock::Cache
                   parents = parents.map(&:_id).uniq.compact
                 end
               end
-              frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc, virtual_path: _virtual_path, parent_ids: parents)
+              frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc, virtual_path: _virtual_path, parent_ids: parents, on_ram: on_ram)
             else
               frag = Hancock::Cache::Fragment.where(name: _name).first
               if overwrite.is_a?(Symbol) or overwrite.is_a?(String)
@@ -151,6 +155,7 @@ module Hancock::Cache
             desc: self.desc,
             virtual_path: self.virtual_path,
             parents: self.parents.map(&:name),
+            on_ram: self.on_ram,
             overwrite: overwrite
           }.compact
         end

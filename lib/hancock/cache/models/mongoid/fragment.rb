@@ -36,6 +36,17 @@ module Hancock::Cache
         field :virtual_path, type: String, localize: false, default: ""
         field :is_html, type: Boolean, default: true
 
+        field :on_ram, type: Boolean, default: false
+        scope :on_ram, ->  {
+          where(on_ram: true)
+        }
+        attr_accessor :on_ram_data
+        def load_data_on_ram
+          if self.on_ram and !self.name.blank?
+            self.on_ram_data = Rails.cache.read(self.name)
+          end
+        end
+
         field :last_clear_time, type: DateTime
         if Hancock.rails4?
           belongs_to :last_clear_user, class_name: Mongoid::Userstamp.config.user_model_name, autosave: false

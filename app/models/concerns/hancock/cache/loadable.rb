@@ -17,7 +17,7 @@ module Hancock::Cache::Loadable
       def load!
         @@load_mutex.synchronize do
           return if @@loaded
-          @@loaded_info = Hancock::Cache::Fragment.cutted.all.to_a.map { |f| [f.name, f] }.to_h
+          @@loaded_info = Hancock::Cache::Fragment.cutted.all.to_a.map { |f| f.load_data_on_ram; [f.name, f] }.to_h
           @@loaded = true
         end
       end
