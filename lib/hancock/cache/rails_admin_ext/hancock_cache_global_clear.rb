@@ -35,6 +35,7 @@ module RailsAdmin
               when "global"
                 begin
                   Rails.cache.clear
+                  Hancock::Cache::Fragment.all.to_a.map(&:clear_dry!)
                   flash[:success] = 'Весь кеш очищен'
                 rescue
                   flash[:error] = 'Ошибка'

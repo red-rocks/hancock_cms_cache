@@ -28,6 +28,16 @@ module Hancock::Cache
           self.set_last_clear_user(f_nameorced_user) and self.save
         end
 
+        def clear_dry(forced_user = nil)
+          if self.set_last_clear_user(forced_user)
+            self.last_clear_time = Time.new
+            self
+          end
+        end
+        def clear_dry!(forced_user = nil)
+          self.clear_dry(forced_user) and self.save
+        end
+
         def clear(forced_user = nil)
           return nil if self.is_in_cleared_stack?
           if self.set_last_clear_user(forced_user)
