@@ -21,7 +21,7 @@ module Hancock
       end
 
 
-      def hancock_cache(obj = [], options = nil, &block)
+      def hancock_cache(obj = [], options = {}}, &block)
         if obj.is_a?(String) or obj.is_a?(Symbol)
           return hancock_fragment_cache obj.to_s, (options || {}).merge(skip_digest: true), &block
 
@@ -39,10 +39,10 @@ module Hancock
           cache_if condition, obj, options, &block
         end
       end
-      def hancock_cache_unless(condition, obj = [], options = nil, &block)
+      def hancock_cache_unless(condition, obj = [], options = {}}, &block)
         hancock_cache_if !condition, obj, options, &block
       end
-      def hancock_cache_if(condition, obj = [], options = nil, &block)
+      def hancock_cache_if(condition, obj = [], options = {}}, &block)
         if condition
           hancock_cache obj, options, &block
         else
@@ -121,10 +121,10 @@ module Hancock
         end
         return ret
       end
-      def hancock_fragment_cache_unless(condition, obj = [], options = nil, &block)
+      def hancock_fragment_cache_unless(condition, obj = [], options = {}, &block)
         hancock_fragment_cache_if !condition, obj, options, &block
       end
-      def hancock_fragment_cache_if(condition, obj = [], options = nil, &block)
+      def hancock_fragment_cache_if(condition, obj = [], options = {}, &block)
         if condition
           hancock_fragment_cache obj, options, &block
         else
