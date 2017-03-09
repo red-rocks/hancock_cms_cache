@@ -71,7 +71,7 @@ module RailsAdmin
               rescue
                 fallback_location = index_path(model_name: @abstract_model)
               end
-              redirect_back(fallback_location: nil)
+              redirect_back(fallback_location: fallback_location)
             end
 
           end
