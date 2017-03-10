@@ -291,8 +291,8 @@ module Hancock::Cache
         after_destroy :reload_fragments
         protected
         def reload_fragments
-          if ApplicationController.respond_to?(:reload_fragments)
-            ApplicationController.reload_fragments
+          if ::ApplicationController.respond_to?(:reload_fragments)
+            ::ApplicationController.reload_fragments
           end
         end
 

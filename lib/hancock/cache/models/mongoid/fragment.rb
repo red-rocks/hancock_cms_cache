@@ -52,6 +52,16 @@ module Hancock::Cache
           belongs_to :last_clear_user, class_name: Mongoid::Userstamp.config.user_model_name, autosave: false
         else
           belongs_to :last_clear_user, class_name: Mongoid::Userstamp.config.user_model_name, autosave: false, optional: true, required: false
+
+          if relations.has_key?("updater") and defined?(::Mongoid::History)
+            belongs_to :updater, class_name: ::Mongoid::History.modifier_class_name, optional: true, validate: false
+            _validators.delete(:updater)
+            _validate_callbacks.each do |callback|
+              if callback.raw_filter.respond_to?(:attributes) and callback.raw_filter.attributes.include?(:updater)
+                _validate_callbacks.delete(callback)
+              end
+            end
+          end
         end
 
         has_and_belongs_to_many :parents, class_name: "Hancock::Cache::Fragment", inverse_of: nil
@@ -231,6 +241,12 @@ module Hancock::Cache
         #   end
         # end
 
+      end
+
+      class_methods do
+        def track_history?
+          false
+        end
       end
 
     end
