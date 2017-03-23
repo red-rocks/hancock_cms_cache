@@ -23,13 +23,15 @@ module Hancock::Cache::Action
         return stale?(obj)
       end
       if obj
-        _last_time = nil
-        _methods = ([:u_at, :updated_at, :c_at, :created_at] + (opts[:last_modified_methods] || [])).uniq
-        _methods.each do |m|
-          _last_time ||= obj.send(m) if obj.respond_to?(m)
-          break if _last_time
+        _last_time = opts[:last_modified]
+        if _last_time.nil?
+          _methods = ([:u_at, :updated_at, :c_at, :created_at] + (opts[:last_modified_methods] || [])).uniq
+          _methods.each do |m|
+            _last_time ||= obj.send(m) if obj.respond_to?(m)
+            break if _last_time
+          end
+          _last_time ||= Time.new
         end
-        _last_time ||= Time.new
         opts.reverse_merge!(last_modified: _last_time, etag: obj, public: true, template: false)
         return stale?(obj)
       else

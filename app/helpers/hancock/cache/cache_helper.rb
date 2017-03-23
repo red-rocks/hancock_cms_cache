@@ -52,8 +52,6 @@ module Hancock
       end
 
       def hancock_fragment_cache(name = '', options = {}, &block)
-        puts @virtual_path.inspect
-        puts name.inspect
         name = @virtual_path if name.blank?
         for_object  = (options and options.delete(:for_object))
         for_objects = (options and options.delete(:for_objects))

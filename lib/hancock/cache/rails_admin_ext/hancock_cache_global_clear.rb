@@ -35,9 +35,9 @@ module RailsAdmin
               when "global"
                 begin
                   Rails.cache.clear
-                  Hancock::Cache::Fragment.all.to_a.map(&:clear_dry!)
+                  ::Hancock::Cache::Fragment.all.to_a.map(&:clear_dry!)
                   flash[:success] = 'Весь кеш очищен'
-                rescue
+                rescue Exception => ex
                   flash[:error] = 'Ошибка'
                 end
               when "fragments"
@@ -45,9 +45,9 @@ module RailsAdmin
                   # Hancock::Cache::Fragment.all.to_a.map do |f|
                   #   f.clear!
                   # end
-                  Hancock::Cache::Fragment.clear_all
+                  ::Hancock::Cache::Fragment.clear_all
                   flash[:success] = 'Кеш очищен'
-                rescue
+                rescue Exception => ex
                   flash[:error] = 'Ошибка'
                 end
               else
