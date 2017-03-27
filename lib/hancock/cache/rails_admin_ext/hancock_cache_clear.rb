@@ -39,9 +39,9 @@ module RailsAdmin
                     ajax_link.call('♻', 'label-success')
                   else
                     flash[:success] = I18n.t('admin.hancock_cache_clear.cleared', obj: @object, name: @object.name)
-                    unless @object.parents.blank?
-                      flash[:info] = "Также, возможно необходимо сбросить кеш с этми ключами: #{@object.parents_str}"
-                    end
+                    # unless @object.parents.blank?
+                    #   flash[:info] = "Также, возможно необходимо сбросить кеш с этми ключами: #{@object.parents_str}"
+                    # end
                   end
                 else
                   if params['ajax'].present?
