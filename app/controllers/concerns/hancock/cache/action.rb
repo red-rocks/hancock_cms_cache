@@ -38,6 +38,7 @@ module Hancock::Cache::Action
         true
       end
     end
+    alias_method :hancock_cache_stale?, :hancock_stale?
 
     def hancock_cache_fragment_stale?(name, opts = {})
       if name.is_a?(Hash)
