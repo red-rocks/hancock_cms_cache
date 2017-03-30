@@ -19,6 +19,7 @@ module Hancock
 
         hancock_settings(key, options, &block)
       end
+      alias_method :hancock_cache_setting, :hancock_cache_settings
 
 
       def hancock_cache(obj = @virtual_path, options = {}, &block)
