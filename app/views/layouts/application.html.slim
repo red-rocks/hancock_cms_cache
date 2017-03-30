@@ -1,0 +1,33 @@
+doctype html
+html lang="ru"
+  head
+    meta charset="UTF-8"
+    meta name="viewport" content="width=device-width, maximum-scale=1"
+    title= yield(:title) || page_title
+    = yield :meta
+    = csrf_meta_tags
+    
+    / - hancock_cache 'favicons' do
+    /   = render partial: 'blocks/favicon'
+
+    = render partial: 'assets'      
+
+  body{class="application_layout #{controller_name} #{action_name} #{controller_name}_#{action_name}"}
+
+    - hancock_cache 'preloader' do
+      = render partial: 'blocks/preloader'
+      
+    #root role="main"
+    
+      header#header
+        = render partial: 'blocks/header'
+      
+      = render "shared/messages"
+      
+      #content
+        = yield
+
+    footer#footer
+      = render partial: 'blocks/footer'
+
+    = render partial: 'hancock/toplink/toplink'

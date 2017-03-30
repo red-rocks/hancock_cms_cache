@@ -21,7 +21,7 @@ module Hancock
       end
 
 
-      def hancock_cache(obj = [], options = {}, &block)
+      def hancock_cache(obj = @virtual_path, options = {}, &block)
         if obj.is_a?(String) or obj.is_a?(Symbol)
           return hancock_fragment_cache obj.to_s, (options || {}).merge(skip_digest: true), &block
 
@@ -51,7 +51,10 @@ module Hancock
         nil
       end
 
-      def hancock_fragment_cache(name = '', options = {}, &block)
+      def hancock_fragment_cache(name = @virtual_path, options = {skip_digest: true}, &block)
+        if name.is_a?(Hash)
+          name, options = name.delete(:name), name
+        end
         name = @virtual_path if name.blank?
         for_object  = (options and options.delete(:for_object))
         for_objects = (options and options.delete(:for_objects))

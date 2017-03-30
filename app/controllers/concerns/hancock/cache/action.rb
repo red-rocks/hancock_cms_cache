@@ -3,7 +3,7 @@ module Hancock::Cache::Action
 
   included do
     def page_cache_key
-      "pages/#{controller_name}_#{action_name}" if (params.keys - ["controller", "action"]).blank?
+      "pages/#{controller_name}_#{action_name}" if (params.keys - ["controller", "action", "rack.session"]).blank?
     end
     def page_cache_obj
       return @page_cache_obj unless @page_cache_obj.nil?
@@ -34,8 +34,6 @@ module Hancock::Cache::Action
         end
         opts.reverse_merge!(last_modified: _last_time, etag: obj, public: true, template: false)
         return stale?(obj)
-      else
-        true
       end
     end
     alias_method :hancock_cache_stale?, :hancock_stale?

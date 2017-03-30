@@ -68,10 +68,12 @@ module Hancock::Cache
         end
         def self.name_from_view(_name)
           if _name.is_a?(Array)
-            _name.map { |n| name_from_view(n) }
+            ret = _name.map { |n| name_from_view(n) }
           else
-            "views/#{_name}"
+            ret = "views/#{_name}"
+            ret = "#{ret}index" if ret[-1] == "/"
           end
+          ret
         end
 
         def self.create_unless_exists(_name, _desc = nil, _virtual_path = "", overwrite = :append)

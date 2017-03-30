@@ -7,8 +7,6 @@ module Hancock::Cache
 
           list do
             field :enabled, :toggle
-            field :on_ram, :toggle
-            field :is_html, :toggle
 
             field :name_n_desc_n_parents
             # field :name_n_desc
@@ -20,8 +18,11 @@ module Hancock::Cache
               visible false
               searchable true
             end
-            field :virtual_path do
-              searchable true
+
+            field :data do
+              pretty_value do
+                bindings[:object].data(false)
+              end
             end
 
             field :last_clear_data
@@ -34,10 +35,10 @@ module Hancock::Cache
               searchable false
             end
 
-            field :data do
-              pretty_value do
-                bindings[:object].data(false)
-              end
+            field :on_ram, :toggle
+            field :is_html, :toggle
+            field :virtual_path do
+              searchable true
             end
 
             field :snapshot_data
