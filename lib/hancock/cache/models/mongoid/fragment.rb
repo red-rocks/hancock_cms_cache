@@ -36,6 +36,11 @@ module Hancock::Cache
         field :virtual_path, type: String, localize: false, default: ""
         field :is_html, type: Boolean, default: true
 
+        field :is_action_cache, type: Boolean, default: false
+        scope :is_action_cache, ->  {
+          where(is_action_cache: true)
+        }
+
         field :on_ram, type: Boolean, default: false
         scope :on_ram, ->  {
           where(on_ram: true)

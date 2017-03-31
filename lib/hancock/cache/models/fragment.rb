@@ -78,10 +78,11 @@ module Hancock::Cache
 
         def self.create_unless_exists(_name, _desc = nil, _virtual_path = "", overwrite = :append)
           if _name.is_a?(Hash)
-            _name, _desc, _virtual_path, overwrite, parents, on_ram =
-            _name[:name], _name[:desc], (_name[:_virtual_path] || ""), _name[:overwrite], _name[:parents], _name[:on_ram]
+            _name, _desc, _virtual_path, overwrite, parents, on_ram, is_action_cache =
+            _name[:name], _name[:desc], (_name[:_virtual_path] || ""), _name[:overwrite], _name[:parents], _name[:on_ram], _name[:is_action_cache]
           end
           on_ram ||= false
+          is_action_cache ||= false
 
           if _name.is_a?(Array)
             return _name.map do |n|
@@ -98,7 +99,7 @@ module Hancock::Cache
                   parents = parents.map(&:_id).uniq.compact
                 end
               end
-              frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc, virtual_path: _virtual_path, parent_ids: parents, on_ram: on_ram)
+              frag = Hancock::Cache::Fragment.create(name: _name, desc: _desc, virtual_path: _virtual_path, parent_ids: parents, on_ram: on_ram, is_action_cache: is_action_cache)
             else
               frag = Hancock::Cache::Fragment.where(name: _name).first
               if overwrite.is_a?(Symbol) or overwrite.is_a?(String)
@@ -114,6 +115,7 @@ module Hancock::Cache
                     end
                   end
                   frag.on_ram = on_ram
+                  frag.is_action_cache = is_action_cache
                   frag = frag.save and frag
 
                 when :overwrite
@@ -129,6 +131,7 @@ module Hancock::Cache
                     frag.parent_ids.compact!
                   end
                   frag.on_ram = on_ram
+                  frag.is_action_cache = is_action_cache
                   frag = frag.save and frag
                 end #case overwrite.to_sym
               else
@@ -143,6 +146,7 @@ module Hancock::Cache
                     end
                   end
                   frag.on_ram = on_ram
+                  frag.is_action_cache = is_action_cache
                   frag = frag.save and frag
                 end
               end #if overwrite.is_a?(Symbol) or overwrite.is_a?(String)
@@ -170,6 +174,7 @@ module Hancock::Cache
             virtual_path: self.virtual_path,
             parents: self.parents.map(&:name),
             on_ram: self.on_ram,
+            is_action_cache: self.is_action_cache,
             overwrite: overwrite
           }.compact
         end

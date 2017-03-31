@@ -14,7 +14,7 @@ module Hancock::Cache::Action
         action: #{action_name}
         params: #{params.inspect}
       TEXT
-      @page_cache_obj = Hancock::Cache::Fragment.create_unless_exists(name: Hancock::Cache::Fragment.name_from_view(_name), desc: _desc)
+      @page_cache_obj = Hancock::Cache::Fragment.create_unless_exists(name: Hancock::Cache::Fragment.name_from_view(_name), desc: _desc, is_action_cache: true)
     end
 
     def hancock_stale?(obj, opts = {})

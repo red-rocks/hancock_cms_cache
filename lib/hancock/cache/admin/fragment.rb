@@ -7,6 +7,9 @@ module Hancock::Cache
 
           list do
             field :enabled, :toggle
+            field :is_action_cache do
+              read_only true
+            end
 
             field :name_n_desc_n_parents
             # field :name_n_desc
@@ -56,10 +59,15 @@ module Hancock::Cache
             field :last_restore_snapshot_time do
               visible false
             end
+
+            scopes [nil, :is_action_cache, :on_ram]
           end
 
           edit do
             field :enabled, :toggle
+            field :is_action_cache do
+              read_only true
+            end
             field :on_ram, :toggle
             field :name
             field :virtual_path
@@ -96,6 +104,9 @@ module Hancock::Cache
 
           show do
             field :enabled, :toggle
+            field :is_action_cache do
+              read_only true
+            end
             field :on_ram, :toggle
             field :name
             field :virtual_path
