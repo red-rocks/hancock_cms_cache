@@ -13,6 +13,10 @@ module Hancock::Cache
 
         include Hancock::Cache::ClearedStack
 
+        def perform_caching
+          self.enabled
+        end
+
         def self.rails_admin_name
           self.name.gsub("::", "~").underscore
         end

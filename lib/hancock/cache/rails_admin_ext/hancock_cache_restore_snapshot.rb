@@ -20,6 +20,10 @@ module RailsAdmin
           true
         end
 
+        register_instance_option :route_fragment do
+          'restore'
+        end
+
         register_instance_option :controller do
           proc do
             ajax_link = Proc.new do |fv, badge|

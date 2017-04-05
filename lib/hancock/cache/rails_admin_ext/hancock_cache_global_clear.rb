@@ -21,7 +21,7 @@ module RailsAdmin
         end
 
         register_instance_option :route_fragment do
-          'hancock_cache_global_clear'
+          'global_clear'
         end
 
         register_instance_option :controller do
