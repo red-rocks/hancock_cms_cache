@@ -137,9 +137,12 @@ if Hancock.mongoid?
 
       after_touch :clear_cache
       after_save :clear_cache
-      after_destroy :clear_cache
-      def clear_cache
-        if perform_caching and !cache_cleared
+      after_destroy :clear_cache_forced
+      def clear_cache_forced
+        clear_cache(true)
+      end
+      def clear_cache(forced = false)
+        if forced or (perform_caching and !cache_cleared)
           # (cache_keys and cache_keys.is_a?(Array) and cache_keys).compact.map(&:strip).uniq.each do |k|
           (all_cache_keys and all_cache_keys.is_a?(Array) and all_cache_keys).compact.map(&:strip).uniq.each do |k|
             unless k.blank?

@@ -71,9 +71,9 @@ module Hancock
         _detect_cache = true
 
         if respond_to?(:hancock_cache_fragments)
-          frag = hancock_cache_fragments[Hancock::Cache::Fragment.name_from_view(name)]
+          frag = hancock_cache_fragments[cache_name(name)]
           # parents = hancock_cache_keys.map do |_name|
-          #   hancock_cache_fragments[Hancock::Cache::Fragment.name_from_view(_name)]
+          #   hancock_cache_fragments[cache_name(_name)]
           # end.compact
           parent_names = hancock_cache_views_keys
           if frag
@@ -90,12 +90,13 @@ module Hancock
             end
           else
             if _detect_cache
-              _name = Hancock::Cache::Fragment.name_from_view(name)
+              _name = cache_name(name)
               _desc = "" #"#{@virtual_path}\noptions: #{options}"
               _virtual_path = @virtual_path
               # Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path, parents: parents)
-              Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path, parent_names: parent_names, on_ram: _on_ram)
-              Hancock::Cache::Fragment.reload!
+              attrs = {name: _name, desc: _desc, virtual_path: _virtual_path, parent_names: parent_names, on_ram: _on_ram, parents: parent_names}
+              Hancock::Cache::Fragment.create_unless_exists(attrs)
+              # Hancock::Cache::Fragment.reload!
               frag = hancock_cache_fragments[_name]
             end
           end
@@ -103,7 +104,7 @@ module Hancock
         else
           if _detect_cache
             # parents = Hancock::Cache::Fragment.by_name_from_view(hancock_cache_keys).to_a
-            # _name = Hancock::Cache::Fragment.name_from_view(name)
+            # _name = cache_name(name)
             # _desc = "" #"#{@virtual_path}\noptions: #{options}"
             # _virtual_path = @virtual_path
             # Hancock::Cache::Fragment.create_unless_exists(name: _name, desc: _desc, virtual_path: _virtual_path, parents: parents)
@@ -150,16 +151,21 @@ module Hancock
               action: #{action_name}
               params: #{params.inspect}
             TEXT
-            Hancock::Cache::Fragment.create_unless_exists(name: Hancock::Cache::Fragment.name_from_view(_name), desc: _desc)
+            Hancock::Cache::Fragment.create_unless_exists(name: cache_name(_name), desc: _desc, is_action_cache: true)
           end
           ret.unshift page_cache_key
         end
+        
 
         ret.uniq.freeze
       end
 
       def hancock_cache_views_keys
-        hancock_cache_keys.map { |k| Hancock::Cache::Fragment.name_from_view(k) }
+        hancock_cache_keys.map { |k| cache_name(k) }
+      end
+
+      def cache_name(name)
+        Hancock::Cache::Fragment.name_from_view(name)
       end
 
     end
