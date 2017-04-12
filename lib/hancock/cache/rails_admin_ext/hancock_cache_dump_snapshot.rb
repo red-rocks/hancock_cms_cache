@@ -68,7 +68,7 @@ module RailsAdmin
 
             unless params['ajax'].present?
               begin
-                fallback_location = index_path(model_name: @abstract_model, id: @object.id)
+                fallback_location = show_path(model_name: @abstract_model, id: @object.id)
               rescue
                 fallback_location = index_path(model_name: @abstract_model)
               end

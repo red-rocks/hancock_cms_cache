@@ -50,6 +50,26 @@ module RailsAdmin
                 rescue Exception => ex
                   flash[:error] = 'Ошибка'
                 end
+              when "reset_parents"
+                begin
+                  # Hancock::Cache::Fragment.all.to_a.map do |f|
+                  #   f.clear!
+                  # end
+                  ::Hancock::Cache::Fragment.reset_parents!
+                  flash[:success] = 'Родители удалены!'
+                rescue Exception => ex
+                  flash[:error] = 'Ошибка'
+                end
+              when "destroy_dependency_graph"
+                begin
+                  # Hancock::Cache::Fragment.all.to_a.map do |f|
+                  #   f.clear!
+                  # end
+                  ::Hancock::Cache::Fragment.destroy_dependency_graph!
+                  flash[:success] = 'Связи сброшены'
+                rescue Exception => ex
+                  flash[:error] = 'Ошибка'
+                end
               else
                 flash[:error] = 'Неверно указан тип кеша для сброса'
               end

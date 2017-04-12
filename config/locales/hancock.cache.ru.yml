@@ -41,6 +41,11 @@ ru:
         menu:       "Обновить контент на сайте"
         breadcrumb: "Обновить контент на сайте"
         title:      "Обновить контент на сайте"
+      hancock_cache_graph:
+        menu:       "Карта кеша"
+        breadcrumb: "Карта кеша"
+        title:      "Карта кеша"
+
     hancock_cache_clear:
       cleared: 'Кеш %{name} сброшен'
       error: "Ошибка: %{err}"

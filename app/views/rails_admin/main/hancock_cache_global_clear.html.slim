@@ -6,10 +6,22 @@
     
     #hancock_cache_global_clear.col-md-12
       .controls
-        div= link_to "Сбросить весь кеш".freeze,        hancock_cache_global_clear_path(model_name: _model.rails_admin_name, type: 'global'),     data: {method: :post}
-        div
-        div= link_to "Сбросить кеш фрагментов".freeze,  hancock_cache_global_clear_path(model_name: _model.rails_admin_name, type: 'fragments'),  data: {method: :post}
-        div
+        - attrs = {data: {method: :post, confirm: "Вы точно хотите удалить весь кеш?"}}
+        - url = hancock_cache_global_clear_path(model_name: _model.rails_admin_name, type: 'global')
+        div= link_to "Сбросить весь кеш".freeze, url, attrs
+        
+        - attrs = {data: {method: :post, confirm: "Вы точно хотите удалить весь кеш фрагментов?"}}
+        - url = hancock_cache_global_clear_path(model_name: _model.rails_admin_name, type: 'fragments')
+        div= link_to "Сбросить кеш фрагментов".freeze, url, attrs
+        
+        - attrs = {data: {method: :post, confirm: "Вы точно хотите удалить лишних родителей?"}}
+        - url = hancock_cache_global_clear_path(model_name: _model.rails_admin_name, type: 'reset_parents')
+        div= link_to "Удалить пустых родителей".freeze, url, attrs
+        
+        - attrs = {data: {method: :post, confirm: "Вы точно хотите удалить все связи между фрагментами?"}}
+        - url = hancock_cache_global_clear_path(model_name: _model.rails_admin_name, type: 'destroy_dependency_graph')
+        div= link_to "Очистить дерево зависимостей".freeze, url, attrs
+        
   .cf{style='clear: both'}
 
 - elsif request.post?

@@ -31,4 +31,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'hancock_cms', [">=1.0.2", "<2.1.x"]
   # spec.add_dependency 'hancock_cms', ["~> 1.0.2", "~> 2.1.x"]
+
+  spec.add_dependency 'visjs-rails'
 end

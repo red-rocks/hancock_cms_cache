@@ -283,14 +283,14 @@ module Hancock::Cache
 
 
         def self.manager_can_add_actions
-          ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_dump_snapshot, :hancock_cache_restore_snapshot]
+          ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_dump_snapshot, :hancock_cache_restore_snapshot, :hancock_cache_graph]
           ret << :model_settings if Hancock::Cache.config.model_settings_support
           # ret << :model_accesses if Hancock::Cache.config.user_abilities_support
           # ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support
           ret.freeze
         end
         def self.rails_admin_add_visible_actions
-          ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_dump_snapshot, :hancock_cache_restore_snapshot]
+          ret = [:hancock_cache_clear, :hancock_cache_global_clear, :hancock_cache_dump_snapshot, :hancock_cache_restore_snapshot, :hancock_cache_graph]
           ret << :model_settings if Hancock::Cache.config.model_settings_support
           ret << :model_accesses if Hancock::Cache.config.user_abilities_support
           # ret += [:comments, :model_comments] if Hancock::Cache.config.ra_comments_support

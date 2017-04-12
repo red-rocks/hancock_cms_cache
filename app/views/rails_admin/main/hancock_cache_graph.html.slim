@@ -1,0 +1,29 @@
+= stylesheet_link_tag 'hancock/rails_admin/cache_graph'
+= javascript_include_tag 'hancock/rails_admin/cache_graph'
+
+#hancock_cache_graph_wrapper  
+  #hancock_cache_graph.col-md-12
+    #cache_network
+    javascript:
+      var nodes = new vis.DataSet(#{{@nodes_for_vis}});
+      
+      var edges = new vis.DataSet(#{{@edges_for_vis}});
+      
+      var container = document.getElementById('cache_network');
+      var data = {
+        nodes: nodes,
+        edges: edges
+      };
+      var options = {};
+      
+      var network = new vis.Network(container, data, options);
+      network.on( 'doubleClick', function(e) {
+        if(e.nodes.length > 0) {
+          var _id = e.nodes[0];
+          nodes.forEach(function(n){
+            if (n.id == _id){
+              eval(n['doubleClick']);
+            }
+          });
+        }
+      });

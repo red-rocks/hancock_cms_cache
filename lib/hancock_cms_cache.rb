@@ -2,10 +2,13 @@ require "hancock/cache/version"
 require 'hancock/cache/engine'
 require 'hancock/cache/configuration'
 
+require 'visjs/rails'
+
 require 'hancock/cache/admin'
 
 require 'hancock/cache/rails_admin_ext/hancock_cache_clear'
 require 'hancock/cache/rails_admin_ext/hancock_cache_global_clear'
+require 'hancock/cache/rails_admin_ext/hancock_cache_graph'
 require 'hancock/cache/rails_admin_ext/hancock_cache_dump_snapshot'
 require 'hancock/cache/rails_admin_ext/hancock_cache_restore_snapshot'
 require 'hancock/cache/rails_admin_ext/hancock_touch'

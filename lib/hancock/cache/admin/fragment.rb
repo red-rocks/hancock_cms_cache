@@ -74,6 +74,17 @@ module Hancock::Cache
             field :is_html, :toggle
             field :desc
             field :parents, :hancock_multiselect
+            field :all_parents do
+              read_only true
+              pretty_value do
+                bindings[:object].all_parents.map do |p|
+                  bindings[:view].link_to(
+                    p.name,
+                    bindings[:view].hancock_show_path(p),
+                  )
+                end.join(", ").html_safe
+              end
+            end
 
             field :last_clear_time do
               read_only true
@@ -113,6 +124,17 @@ module Hancock::Cache
             field :is_html
             field :desc
             field :parents
+            field :all_parents do
+              read_only true
+              pretty_value do
+                bindings[:object].all_parents.map do |p|
+                  bindings[:view].link_to(
+                    p.name,
+                    bindings[:view].hancock_show_path(p),
+                  )
+                end.join(", ").html_safe
+              end
+            end
             field :parent_names do
               visible do
                 render_object = (bindings[:controller] || bindings[:view])

@@ -106,6 +106,23 @@ module Hancock::Cache
           self.all.map(&:reset_parents!)
         end
 
+        def all_parents
+          new_parents = _parents = self.parents.to_a
+          begin
+            new_parents = new_parents.map(&:parents).flatten - _parents
+            _parents += new_parents
+          end until(new_parents.size == 0)
+          _parents.uniq
+        end
+
+        def self.destroy_dependency_graph!
+          self.all.map do |f|
+            f.parent_names = []
+            f.parent_ids = []
+            f.save
+          end
+        end
+
         def name_n_desc
           "#{self.name}<hr>#{self.desc}".html_safe
         end
