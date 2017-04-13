@@ -145,8 +145,8 @@ if Hancock.mongoid?
         if forced or (perform_caching and !cache_cleared)
           # (cache_keys and cache_keys.is_a?(Array) and cache_keys).compact.map(&:strip).uniq.each do |k|
           (all_cache_keys and all_cache_keys.is_a?(Array) and all_cache_keys).compact.map(&:strip).uniq.each do |k|
+            k = k.strip unless k.nil?
             unless k.blank?
-              k = k.strip
               if _frag = Hancock::Cache::Fragment.where(name: k).first
                 _frag.clear!
               else
