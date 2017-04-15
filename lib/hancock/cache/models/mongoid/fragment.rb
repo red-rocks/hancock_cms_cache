@@ -23,13 +23,7 @@ module Hancock::Cache
           end
         }
         scope :by_name_from_view, -> (_name) {
-          by_name(self.name_from_view(_name))
-        }
-        scope :find_by_name, -> (_name) {
-          by_name(_name).first
-        }
-        scope :find_by_name_from_view, -> (_name) {
-          by_name_from_view(_name).first
+          by_name(name_from_view(_name))
         }
 
         field :desc, type: String, localize: Hancock::Cache.config.localize, default: ""
