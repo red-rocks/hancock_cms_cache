@@ -21,6 +21,8 @@ module Hancock::Cache
 
     attr_accessor :preloaded_fragments
 
+    attr_accessor :only_direct_parents
+
     def initialize
 
       @localize = Hancock.config.localize
@@ -32,6 +34,8 @@ module Hancock::Cache
       @ra_comments_support = !!defined?(RailsAdminComments)
 
       @preloaded_fragments = []
+
+      @only_direct_parents = false
 
     end
   end

@@ -117,6 +117,8 @@ module Hancock::Cache
                     else
                       frag.parent_ids += parents.map(&:_id).uniq.compact
                     end
+                    frag.parent_ids.uniq!
+                    frag.parent_ids.compact!
                   end
                   frag.on_ram = on_ram
                   frag.is_action_cache = is_action_cache

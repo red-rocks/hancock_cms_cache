@@ -76,6 +76,9 @@ module Hancock
           #   hancock_cache_fragments[cache_name(_name)]
           # end.compact
           parent_names = hancock_cache_views_keys
+          if Hancock::Cache.config.only_direct_parents
+            parent_names = ([(parent_names || []).last]).compact
+          end
           if frag
             frag.set_for_object(for_object) if for_object
             frag.set_for_objects(for_objects) if for_objects
@@ -155,7 +158,7 @@ module Hancock
           end
           ret.unshift page_cache_key
         end
-        
+
 
         ret.uniq.freeze
       end
