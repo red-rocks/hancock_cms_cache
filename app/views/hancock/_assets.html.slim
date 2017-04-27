@@ -1,10 +1,11 @@
-- layout_name           ||= controller.send(:_layout, []) || 'application' rescue 'application'
-- stylesheet_name       ||= layout_name
-- javascript_name       ||= layout_name
-- assets_cache_key      ||= "layouts/#{layout_name}/assets"
-- custom_head_cache_key ||= "layouts/#{layout_name}/custom_head"
-- async = false unless defined?(async) #Rails.env.production?
-- defer = true  unless defined?(defer) #Rails.env.production?  
+ruby:
+  layout_name           ||= controller.send(:_layout, []) || 'application' rescue 'application'
+  stylesheet_name       ||= layout_name
+  javascript_name       ||= layout_name
+  assets_cache_key      ||= "layouts/#{layout_name}/assets"
+  custom_head_cache_key ||= "layouts/#{layout_name}/custom_head"
+  async = false unless defined?(async) #Rails.env.production?
+  defer = true  unless defined?(defer) #Rails.env.production?  
 - if Rails.env.production?  
   - hancock_cache assets_cache_key do
     = stylesheet_link_tag stylesheet_name, media: "all", async: async, defer: defer
