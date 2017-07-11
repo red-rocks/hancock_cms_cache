@@ -111,6 +111,8 @@ module Hancock::Cache
             field :last_restore_snapshot_time do
               read_only true
             end
+
+            Hancock::RailsAdminGroupPatch::hancock_cms_group(self, fields)
           end
 
           show do
@@ -152,6 +154,12 @@ module Hancock::Cache
             end
             field :last_dump_snapshot_time
             field :last_restore_snapshot_time
+
+            Hancock::RailsAdminGroupPatch::hancock_cms_group(self, fields)
+          end
+
+          if block_given?
+            yield self
           end
         }
 

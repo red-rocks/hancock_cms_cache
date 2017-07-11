@@ -70,7 +70,7 @@ module Hancock::Cache::Action
     end
 
     def perform_caching?(obj = page_cache_obj)
-      obj and obj.perform_caching
+      obj and !!obj.perform_caching
     end
     def cancel_caching?(obj = page_cache_obj)
       obj and !obj.perform_caching
