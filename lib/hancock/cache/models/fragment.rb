@@ -29,7 +29,7 @@ module Hancock::Cache
         #   self.last_clear_user = forced_user if forced_user
         # end
         def set_last_clear_user!(forced_user = nil)
-          self.set_last_clear_user(f_nameorced_user) and self.save
+          self.set_last_clear_user(forced_user) and self.save
         end
 
         def clear_dry(forced_user = nil)
