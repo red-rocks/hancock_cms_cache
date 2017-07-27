@@ -70,17 +70,13 @@ module Hancock::Cache
               bindings[:object].raw_array.join("<br>").html_safe
             end
           end
-          # field :raw_hash do
-          #   weight 10
-          #   searchable true
-          #   pretty_value do
-          #     ret = []
-          #     bindings[:object].raw_hash.each_pair do |k, v|
-          #       ret << "#{k}: #{v}"
-          #     end
-          #     ret.join("<br>").html_safe
-          #   end
-          # end
+          field :raw_hash do
+            weight 10
+            searchable true
+            pretty_value do
+              "<pre>#{JSON.pretty_generate(bindings[:object].raw_hash)}</pre>".html_safe
+            end
+          end
           field :cache_keys_str, :text do
             weight 11
             searchable true
