@@ -98,7 +98,16 @@ module Hancock::Cache
             searchable true
           end
           if ::Settings.table_exists?
-            nss = ::RailsAdminSettings::Setting.distinct(:ns).map { |c| "ns_#{c.gsub('-', '_')}".to_sym }
+            nss = ::RailsAdminSettings::Setting.distinct(:ns).map { |c|
+              next if c =~ /^rails_admin_model_settings_/ and defined?(RailsAdminModelSettings)
+              "ns_#{c.gsub('-', '_')}".to_sym
+            }.compact
+          else
+            nss = []
+          end
+          if defined?(RailsAdminModelSettings)
+            scopes([:no_model_settings, :model_settings, nil] + nss)
+          else
             scopes([nil] + nss)
           end
         end
